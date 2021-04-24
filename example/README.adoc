@@ -64,7 +64,7 @@ When the application is executed you should see the following log output: +
 (004) .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 1 JPA repository interfaces.
 (005) com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
 (006) com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-(007) n.l.s.preliquibase.PreLiquibase          : PreLiquibase: Executing SQL script : URL [file:/dev/java/PreLiquibaseSpringBoot/example/target/classes/preliquibase/preliquibase-h2.sql]
+(007) n.l.s.preliquibase.PreLiquibase          : PreLiquibase: Executing SQL script : URL [file:/dev/java/PreLiquibaseSpringBoot/example/target/classes/preliquibase/h2.sql]
 (008) l.lockservice.StandardLockService        : Successfully acquired change log lock
 (009) l.c.StandardChangeLogHistoryService      : Creating database history table with name: medusa_uat9.DATABASECHANGELOG
 (010) l.c.StandardChangeLogHistoryService      : Reading from medusa_uat9.DATABASECHANGELOG
