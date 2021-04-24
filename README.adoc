@@ -9,6 +9,15 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+
+
+
+image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="http://www.apache.org/licenses/LICENSE-2.0",target=_blank]
+image:https://github.com/lbruun/pre-liquibase/actions/workflows/main.yml/badge.svg[CI]
+image:https://maven-badges.herokuapp.com/maven-central/net.lbruun.springboot/preliquibase-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/net.lbruun.springboot/preliquibase-spring-boot-starter"]
+image:https://javadoc.io/badge2/net.lbruun.springboot/preliquibase-spring-boot-starter/javadoc.svg[javadoc,link="https://javadoc.io/doc/net.lbruun.springboot/preliquibase-spring-boot-starter"]
+
+
 Companion to https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-execute-liquibase-database-migrations-on-startup[Spring Boot Liquibase module]
 which allows to execute some SQL script file _prior_ to executing https://www.liquibase.org/[Liquibase] ChangeSets.
 
