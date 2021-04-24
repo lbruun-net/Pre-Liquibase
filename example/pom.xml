@@ -25,7 +25,7 @@ limitations under the License.
     </parent>
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-example</artifactId>
-    <version>0.9.6-SNAPSHOT</version>
+    <version>0.9.6</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,7 +47,7 @@ limitations under the License.
         <dependency>
             <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-starter</artifactId>
-            <version>0.9.6-SNAPSHOT</version>
+            <version>0.9.6</version>
         </dependency>
 
         <!-- JDBC drivers - a real life application would probably have 
@@ -88,4 +88,8 @@ limitations under the License.
             </plugin>
         </plugins>
     </build>
+
+  <scm>
+    <tag>0.9.6</tag>
+  </scm>
 </project>
