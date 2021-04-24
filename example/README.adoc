@@ -1,0 +1,97 @@
+= Pre-Liquibase example application
+:source-linenums-option:
+:toc:
+:toc-placement!:
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+Example application **Medusa** showcases how the Pre-Liquibase module
+might be used for a Spring Boot based application. The aim of Pre-Liquibase
+in this application is to ensure that a database "home" (a catalog or a schema)
+exists for the currrent instance of the application. This way multiple instances
+of the application can all use the same database server and the same database 
+identity, yet inside the database server the various instances are duly
+separated.
+
+The example application uses
+
+- Spring Boot 2
+- Spring Data JPA (Hibernate)
+- Liquibase
+
+
+With the example we've achieved:
+
+- The Pre-Liquibase module ensures that the schema where tables
+  live (including the two Liquibase metadata tables) actually exist prior to 
+  executing Liquibase itself.
+- The schema name is dynamic. It takes its name partly from an
+  OS environment variable, `MEDUSA_ENVNAME`, so that different instances
+  of the Medusa application can use the same database user, albeit they
+  will be separated by schema name. This way, when a new instance (a new environment)
+  of the Medusa application is created, say 'uat3', the schema
+  will be auto-created with a name of 'medusa_uat3'. All we have to 
+  do is to make sure that different Medusa environments have different value
+  in the OS environment variable `MEDUSA_ENVNAME`. Such way of working fits nicely
+  with the cloud world: different instances of our application (of the same version) deployed 
+  as different environment should _not_ differ in what gets deployed. They should
+  only differ in their environment. The alternative is that our source code repo will
+  have environment specific information in it. That is rarely a good idea.
+ 
+ 
+The project validates the Spring Environment properties, in particular `medusa.envName`, on startup. 
+You certainly don't have to do that. It is merely meant as an example of how to
+validate Spring properties which come from a source you don't fully expect to always
+comply with the application's requirements (meaning an operator may have misconfigured something).
+
+ 
+=== Running the application
+ 
+When the application is executed you should see the following log output: +
+(for this execution the content of the OS environment variable MEDUSA_ENVNAME was `uat9`)
+
+ 
+[source,text]
+----
+(001) n.l.s.p.example.MedusaApplication        : Starting MedusaApplication using Java ....
+(002) n.l.s.p.example.MedusaApplication        : No active profile set, falling back to default profiles: default
+(003) .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+(004) .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 1 JPA repository interfaces.
+(005) com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+(006) com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+(007) n.l.s.preliquibase.PreLiquibase          : PreLiquibase: Executing SQL script : URL [file:/dev/java/PreLiquibaseSpringBoot/example/target/classes/preliquibase/preliquibase-h2.sql]
+(008) l.lockservice.StandardLockService        : Successfully acquired change log lock
+(009) l.c.StandardChangeLogHistoryService      : Creating database history table with name: medusa_uat9.DATABASECHANGELOG
+(010) l.c.StandardChangeLogHistoryService      : Reading from medusa_uat9.DATABASECHANGELOG
+(011) liquibase.changelog.ChangeSet            : Table PERSONS created
+(012) liquibase.changelog.ChangeSet            : Primary key added to PERSONS (PERSON_ID)
+(013) liquibase.changelog.ChangeSet            : ChangeSet classpath:/db/changelog/db.changelog_schema_1.0.0.yaml::1.0.0::lbruun ran successfully in 2ms
+(014) l.lockservice.StandardLockService        : Successfully released change log lock
+(015) o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+(016) org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.27.Final
+(017) o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+(018) org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+(019) o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+...
+----
+
+Line 7 is Pre-Liquibase being executed. +
+Lines 8-14 is Liquibase itself. +
+Lines 15-19 is Hibernate initialization. +
+
+
+
+
+
+
+
+
+
+
+
+

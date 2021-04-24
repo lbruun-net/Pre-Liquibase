@@ -1,0 +1,27 @@
+#
+#  Defines Git attributes per file path / file pattern
+#
+
+
+# Define some file types explicitly as being text.
+# This makes sure that we can never inadvertently get
+# a file of this type into the repo with a line ending
+# other than the Unix-style line ending.
+# This will also override the user's own global git settings
+# for these file types.
+
+*.adoc             text eol=lf
+*.java             text eol=lf
+*.md               text eol=lf
+*.properties       text eol=lf
+*.sql              text eol=lf
+*.xml              text eol=lf
+*.yml              text eol=lf
+*.yaml             text eol=lf
+spring.factories   text eol=lf
+
+
+.gitattributes     text eol=lf
+.gitignore         text eol=lf
+LICENSE            text eol=lf
+

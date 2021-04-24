@@ -1,0 +1,328 @@
+= Spring Boot Pre-Liquibase
+:toc:
+:toc-placement!:
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+Companion to https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-execute-liquibase-database-migrations-on-startup[Spring Boot Liquibase module]
+which allows to execute some SQL script file _prior_ to executing https://www.liquibase.org/[Liquibase] ChangeSets.
+
+Why? While you should be using Liquibase for all your DDL there's a bit of a chicken-and-egg problem: 
+The database and schema where Liquibase puts itself into obviously cannot be created by Liquibase itself. 
+This module solves this problem by allowing you to "deploy" such DB prerequisities as part of your application code.
+Typical use is to create database schema or database catalog so that Liquibase objects have "a home" where
+they can live.
+
+*Pre-Liquibase* is a Spring Boot v2 auto-configuration module. You only need to add the dependency as well 
+as the SQL script you want executed prior to Liquibase execution. There is no Java code for you to add to your project.
+
+WARNING: Whatever you put in your SQL script file(s) for this module should be something which Liquibase cannot handle.
+(example: creating a schema for Liquibase's own use). You are using Liqiubase for a reason so you should have _all_ of 
+your table model initialization in Liquibase ChangeSets. Most likely your SQL file for this module will be a one-liner. 
+If not, you should pause and ask yourself if you are doing the right thing.
+
+The module requires 
+
+- Java 8 or later 
+- Spring Boot 2.2+  (might work with earlier versions too, but this has not been tested).
+
+{nbsp} +
+{nbsp} +
+
+toc::[]
+
+
+== When to use this module?
+
+- You want to setup database pre-requisites for Liquibase as part of your application code.
+- You want to use the same database user for several environments (for the same application) but
+you want each environment to use its own schema or own catalog. This is an inexpensive and simple
+way of hosting multiple "editions" of your application on the same database server, for example your
+'dev1, 'dev2', 'uat' and 'sit' environments can all use the same database user without clashing
+with each other.
+- Anything you can think of (but be sure not to use the module for something which Liquibase itself
+  should rightfully do)
+
+
+
+== Quick start (Maven)
+
+. Add the following dependency to your project:
+
+[source,xml]
+----
+<dependency>
+    <groupId>net.lbruun.springboot</groupId>
+    <artifactId>preliquibase-spring-boot-starter</artifactId>
+    <version>  ---latest-version---  </version>
+</dependency>
+----
+[start=2]
+. Add SQL file(s) to `src/main/resources/preliquibase` and name them `DBENGINECODE.sql` (where 'DBENGINECODE' is 
+one of the string codes which are supported for database engine auto-detection) or simply `default.sql` if 
+the SQL file applies generically to any type of database engine. If your Pre-Liquibase script is about ensuring a 
+schema exists (not unlikely, this is the main use-case for Pre-Liquibase) then your SQL script might look like this:
+
+[source,text]
+----
+CREATE SCHEMA IF NOT EXISTS ${spring.liquibase.default-schema};
+----
+
+and application properties like this:
+
+[source,properties]
+----
+spring.jpa.properties.hibernate.default_schema=${my.db.schemaname}
+spring.liquibase.default-schema=${my.db.schemaname}
+----
+
+Now - in this example - the only thing left to decide is where the `my.db.schemaname` value
+comes from. That is your choice. The link:example/[example project] advocates
+that it should come from an OS environment variable, in particular if your are
+deploying to a cloud.
+
+
+Done!
+
+
+
+== Usage 
+
+The module is a Spring Boot V2 auto-configuration. Once you add the dependency to your application it will automatically
+trigger its own auto-configuration if you also have Liquibase in your classpath. The module will make
+sure it always fires _before_ Liquibase itself. The module has no effect if you add it to
+a Spring Boot project which does not use Liquibase.
+
+The module will search for SQL script files in pre-defined locations and execute those. You can have seperate SQL scripts 
+for various database platforms (for example one for PostgreSQL and another for MS SQL Server, etc). At runtime the type of
+database will be auto-detected so that the right SQL script is executed.
+
+SQL script files can contain replacement variables on the form `${propertyName}` or `${propertyName:defaultValue}` so
+as to make your SQL script file dynamic. The property will be resolved from your application's Spring Environment.
+
+You can find an example project link:example/[here].
+
+
+=== Maven dependency
+
+The module's artifacts are available from Maven Central. True to how Spring Boot auto-configuration is organized you simply add a "Starter" 
+to your project:
+
+[source,xml]
+----
+<dependency>
+    <groupId>net.lbruun.springboot</groupId>
+    <artifactId>preliquibase-spring-boot-starter</artifactId>
+    <version>  ---latest-version---  </version>
+</dependency>
+----
+
+=== SQL Script syntax
+
+The module uses the Spring Framework's build-in support for parsing and executing the SQL script file(s).
+
+Rules for the file are:
+
+- The syntax used must be native to your target database platform. You cannot use constructs from higher-level
+  tools such as SQL*Plus (Oracle), `psql` (PostgreSQL) or `sqlcmd` (MS SQL Server).
+- Statements ends with a semi-colon character.
+- Comment lines start with `--`.
+- Replacement variables on the form `${propertyName}` or `${propertyName:defaultValue}` can appear
+  anywhere in the file so as to make your SQL script file dynamic. The property will be resolved from 
+  your application's Spring Environment.
+- The script should be idempotent code (only-create-if-not-already-exists statements), execute quickly 
+  and generally be without side effects. Remember that the SQL script will be executed _every_ time 
+  your application starts. Also, unlike Liquibase itself, Pre-Liquibase does not have a mechanism
+  to ensure that the script only executes on only one node, if your application is multi-node. To mitigate
+  this the script should ideally be one atomic unit which the database engine can execute. Yet
+  another reason why you would probably want to have only a single SQL statement in your script.
+- Don't bother putting SELECT statements in the script. The result will not be shown anywhere.
+
+
+
+=== How the module locates SQL script files
+
+There are two ways SQL scripts are located by Pre-Liquibase:
+
+1. From classpath: If a file named `preliquibase/DBPLATFORMCODE.sql` exists it will be executed. DBPLATFORMCODE is a string code 
+representing the type of database in use. The module will auto-detect the database platform, but you can optionally override 
+the value with the `dbPlatformCode` configuration property. If no such file `preliquibase/DBPLATFORMCODE.sql` file exists the
+module will execute a file named `preliquibase/default.sql` if it exists.
+
+2. If the property `sqlScriptReferences` has been set then that takes precedence over (1). The value of this property is expected
+to be a comma-separated list of https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-resource-strings[Spring Resource references]
+to SQL script files. All of the SQL script files in the list will be executed, in the order they are listed.
+
+NOTE: The way SQL script files are located and named is heavily inspired by 
+https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-initialize-a-database-using-spring-jdbc[Spring Boot's DataSource Initialization feature]. 
+However, there are some important differences: Pre-Liquibase auto-detects which database platform you are using and secondly if a platform 
+specific SQL script file is found then Pre-Liquibase will not attempt to _also_ execute the platform generic file (`default.sql`).
+
+
+
+=== Database platform auto-detection
+
+The module does not attempt to interpret the SQL you put in your SQL script files. It does, however, have a feature 
+for auto-detecting which database platform is in use. It uses this information to figure out which SQL script file to
+execute. This is ideal if your application is meant to support multiple database platforms.
+
+Simply name your SQL script `preliquibase/DBPLATFORMCODE.sql` and put it in the classpath. For example, you may name your SQL script
+file `preliquibase/postgresql.sql` and such script will then only be executed if the database platform in use is PostgreSQL.
+
+Auto-detection is accomplished using Liquibase library, hence the DBPLATFORMCODEs you can use are the same as
+can be used in an Liquibase `dbms` Precondition. For reference, here's a list of some of them:
+
+* `postgresql`. PostgreSQL
+* `mysql`. MySQL
+* `mariadb`. MariaDB
+* `mssql`. Microsoft SQL Server
+* `h2`. H2 database
+* `hsqldb`. HyperSQL database
+* `oracle`. Oracle Database
+* `db2`. IBM Db2 on Linux, Unix and Windows
+* `db2z`. IBM Db2 on zOS
+* `derby`. Apache Derby
+* `sqlite`. SQLite
+* `sybase`. Sybase Adaptive Server Enterprise
+* `unsupported`. Database not supported by Liquibase
+
+
+
+
+=== Configuration
+
+The behavior of the module can be changed with the following configuration properties, prefixed with `preliquibase.`:
+
+[cols=4*,options=header]
+|===
+|Property name
+|Type
+|Default
+|Description
+
+|enabled
+|boolean
+|true
+|If the module is enabled or not?
+
+|dbPlatformCode
+|String
+|null
+|Database platform code used for locating SQL scripts which uses the naming form `preliquibase/DBPLATFORMCODE.sql` from classpath. 
+Setting this property will override auto-detection of the database platform being used. 
+
+|sqlScriptReferences
+|CSV 
+|null
+|Comma-separated list of Spring Resource locations for where to alternatively find the SQL scripts (including the filename itself).
+The value must be a comma-separated list of Spring Resource references, for example `file:/foo/bar/myscript1.sql,file:/foo/bar/myscript2.sql`.
+The resource must exist, otherwise an `InvalidConfigurationPropertyValueException` exception is thrown. All scripts in the list
+will be executed.
+
+Setting this property is an alternative to the default: loading scripts from `classpath:/preliquibase/` location. 
+
+|continueOnError
+|boolean 
+|false
+|Whether to stop with an RuntimeException if an error occurs while executing the SQL script. If `false`, script execution
+will stop on first error and throw RuntimeException. If `true`, script execution will continue even there are errors
+in the script and errors will be logged if logging level for `org.springframework.jdbc.datasource.init` is at least
+`DEBUG`.
+
+Setting `continueOnError` to `true` should generally be avoided. It is probably a sign of your SQL script file(s) not being idempotent. 
+You should work on that first and only use this setting as a last resort.
+
+|separator
+|String
+|;
+|The statement separator used in the SQL script. For most database engines this is the semi-colon character.
+
+|sqlScriptEncoding
+|String
+|UTF-8
+|The character encoding for the SQL script file(s). The value must be the name of a JDK Charset, such as
+`US-ASCII`, `ISO-8859-1`, `UTF-8` or `UTF-16`.
+
+|===
+
+
+== Additional notes
+
+=== Which DataSource is used?
+
+The module will use the same DataSource as Spring Boot Liquibase module does. This seams
+reasonable and there are currently no plans to change it or to allow flexibility in this respect.
+
+=== To quote or not to quote?
+You need to consider case (upper/lower) for the schema name. The SQL standard mandates that object names
+are treated case-insentive if the value is not quoted.
+
+However, there's a quirk in Liquibase. While Liquibase in general offers offers control over SQL object 
+quoting behavior (by way of the `objectQuotingStrategy` 
+attribute in your changelog) the same is not true in respect to Liquibase system tables, i.e. DATACHANGELOG and 
+DATABASECHANGELOGLOCK. Here Liquibase will always use the strategy named `LEGACY`. This means that SQL objects will 
+be quoted if they are of mixed case, otherwise not. This may create unexpected results. Therefore, the advice is to 
+*_use either all lower-case or all upper-case for scheme name, never mixed case_*. In short 'Foo_bar' is not a good value, 
+but 'FOO_BAR' or 'foo_bar' is.
+
+An example: 
+
+Let's say you are asking Pre-Liquibase to execute a SQL script for PostgresSQL like this
+
+[source,text]
+----
+CREATE SCHEMA IF NOT EXISTS ${my.db.schemaname};
+----
+
+and you are then telling Liquibase to use the exact same value:
+
+[source,properties]
+----
+spring.liquibase.default-schema=${my.db.schemaname}
+----
+
+All is good?  No, not so, if the value for `${my.db.schemaname}` is of mixed case, let's say `Foo_bar`.
+Liquibase will attempt to create its system tables in a schema named `"Foo_bar"` (quoted) but the Pre-Liquibase
+SQL script will have created a schema in the database server with name `foo_bar` so you'll get an 
+error on Liquibase execution. Hence the recommendation to not use mixed-case. Such strategy
+will work with any database platform.
+
+=== Troubleshooting
+
+Turn on logging. Depending on what you want to dig into here are some properties you may want to set:
+
+[source,properties]
+----
+debug=true
+logging.level.org.springframework.jdbc.datasource.init=DEBUG
+logging.level.org.springframework.boot.autoconfigure=DEBUG
+logging.level.net.lbruun.springboot.preliquibase=TRACE
+logging.level.liquibase=TRACE
+----
+
+== Alternatives
+
+You can in theory use Spring Boot's DataSource initialization feature or JPA DDL or Hibernate DDL as described 
+https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-initialize-a-database-using-spring-jdbc[here], 
+but the Spring Boot guide clearly explains that you should not use such methods along side "a higher-level Database Migration Tool, 
+like Flyway or Liquibase" because these methods are not guaranteed to execute before Liquibase and if they happen to do so 
+at the moment they might not in the future. In constrast the Pre-Liquibase module is designed specifically 
+for use with Liquibase and is guaranteed to _always_ execute before Liquibase itself.
+
+
+
+== References
+
+* Flyway, Liquibase competitor, has a feature for ensuring that the schema exists prior to executing the Flyway migration:  
+  https://flywaydb.org/documentation/concepts/migrations.html#schema-creation[createSchemas option]. Liquibase has no equivalent feature.
+* Executing some SQL prior to the Liquibase ChangeSets has been discussed several times on the Liquibase forum. Example threads:
+  ** https://forum.liquibase.org/t/advice-on-how-to-create-a-schema-for-defaultschemaname/470[Advice on how to create a schema for defaultSchemaName]
+  ** https://forum.liquibase.org/t/how-to-create-a-schema-for-defaultschemaname/4103[how to create a schema for defaultSchemaName]
+
+
+
