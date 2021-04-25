@@ -27,13 +27,14 @@ limitations under the License.
     <artifactId>preliquibase-spring-boot-example</artifactId>
     <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>Spring Boot AutoConfiguration :: Pre-Liquibase Example</name>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.target>8</maven.compiler.target>       
     </properties>
-    <name>Spring Boot AutoConfiguration :: Pre-Liquibase Example</name>
-       
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -47,11 +48,11 @@ limitations under the License.
         <dependency>
             <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-starter</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.1-SNAPSHOT</version> <!-- in a real life application you would not use a SNAPSHOT version here -->
         </dependency>
 
         <!-- JDBC drivers - a real life application would probably have 
-             fewer depending on which database platforms it supports    -->
+             fewer depending on which database platforms it supports.    -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -60,7 +61,6 @@ limitations under the License.
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>9.2.0.jre8</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -68,6 +68,10 @@ limitations under the License.
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+        </dependency>   
         <dependency> 
             <!-- Embedded db. Used when no DataSource is configured -->
             <groupId>com.h2database</groupId>
@@ -87,13 +91,10 @@ limitations under the License.
                 </configuration>
             </plugin>
 
-
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
 
         </plugins>
     </build>
