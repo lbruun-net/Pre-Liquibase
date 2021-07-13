@@ -162,7 +162,7 @@ public class PreLiquibaseAutoConfiguration {
      *    'preliquibase.enabled'
      *    'spring.liquibase.enabled'
      * 
-     * must not have a value of "false"´or the property must be absent.
+     * must not have a value of "false"Â´or the property must be absent.
      */
     static final class EnabledCondition extends AllNestedConditions {
 
@@ -227,7 +227,7 @@ public class PreLiquibaseAutoConfiguration {
             LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration = 
                     new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
             SpringLiquibase liquibase = liquibaseConfiguration.liquibase(
-                    dataSourceProperties, dataSource, liquibaseDataSource);
+                    dataSource, liquibaseDataSource);
             
             // Sanity check
             Objects.requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");
