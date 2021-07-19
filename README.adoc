@@ -301,6 +301,14 @@ SQL script will have created a schema in the database server with name `foo_bar`
 error on Liquibase execution. Hence the recommendation to not use mixed-case. Such strategy
 will work with any database platform.
 
+=== Unit testing
+
+You can use Spring Boot's `@DataJpaTest` annotation as you normally would because the Pre-Liquibase module 
+registers itself as one of the auto-configs which are in-scope when this annotation is applied to a test class.
+
+The link:example/[example project] showcases this.
+
+
 === Troubleshooting
 
 Turn on logging. Depending on what you want to dig into here are some properties you may want to set:

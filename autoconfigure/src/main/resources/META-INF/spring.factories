@@ -1,2 +1,8 @@
-#
+# Add Pre-Liquibase class to list of Spring Boot's auto-configurations
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration
+#
+#
+# Add Pre-Liquibase class to list of classes auto-configured
+# when @AutoConfigureDataJpa or @DataJpaTest annotations are used in
+# unit tests.
+org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa=net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration
