@@ -275,9 +275,9 @@ However, there's a quirk in Liquibase. While Liquibase in general offers offers 
 quoting behavior (by way of the `objectQuotingStrategy` 
 attribute in your changelog) the same is not true in respect to Liquibase system tables, i.e. DATACHANGELOG and 
 DATABASECHANGELOGLOCK. Here Liquibase will always use the strategy named `LEGACY`. This means that SQL objects will 
-be quoted if they are of mixed case, otherwise not. This may create unexpected results. Therefore, the advice is to 
-*_use either all lower-case or all upper-case for schema name, never mixed case_*. In short 'Foo_bar' is not a good value, 
-but 'FOO_BAR' or 'foo_bar' is.
+be quoted if they are of mixed case, otherwise not. This may create unexpected results with regards to the name
+of the schema holding the the Liquibase system tables. Therefore, the advice is to *_use either all lower-case or 
+all upper-case for schema name, never mixed case_*. In short 'Foo_bar' is not a good value, but 'FOO_BAR' or 'foo_bar' is.
 
 An example: 
 
@@ -298,7 +298,7 @@ spring.liquibase.default-schema=${my.db.schemaname}
 All is good?  No, not so, if the value for `${my.db.schemaname}` is of mixed case, let's say `Foo_bar`.
 Liquibase will attempt to create its system tables in a schema named `"Foo_bar"` (quoted) but the Pre-Liquibase
 SQL script will have created a schema in the database server with name `foo_bar` so you'll get an 
-error on Liquibase execution. Hence the recommendation to not use mixed-case. Such strategy
+error on Liquibase execution. Hence the recommendation to not use mixed-case for the schema name. Such strategy
 will work with any database platform.
 
 === Unit testing
