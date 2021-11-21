@@ -276,7 +276,7 @@ quoting behavior (by way of the `objectQuotingStrategy`
 attribute in your changelog) the same is not true in respect to Liquibase system tables, i.e. DATACHANGELOG and 
 DATABASECHANGELOGLOCK. Here Liquibase will always use the strategy named `LEGACY`. This means that SQL objects will 
 be quoted if they are of mixed case, otherwise not. This may create unexpected results. Therefore, the advice is to 
-*_use either all lower-case or all upper-case for scheme name, never mixed case_*. In short 'Foo_bar' is not a good value, 
+*_use either all lower-case or all upper-case for schema name, never mixed case_*. In short 'Foo_bar' is not a good value, 
 but 'FOO_BAR' or 'foo_bar' is.
 
 An example: 
