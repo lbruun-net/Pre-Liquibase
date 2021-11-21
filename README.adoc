@@ -73,7 +73,7 @@ with each other.
 ----
 [start=2]
 . Add SQL file(s) to folder `src/main/resources/preliquibase/` and name them `DBENGINECODE.sql` (where 'DBENGINECODE' is 
-one of the string codes which are supported for database engine auto-detection) or simply `default.sql` if 
+one of the string codes which are supported for database engine auto-detection, see <<auto_detection>>) or simply `default.sql` if 
 the SQL file applies generically to any type of database engine. If your Pre-Liquibase script is about ensuring a 
 schema exists (not unlikely, this is the main use-case for Pre-Liquibase) then your SQL script might look like this:
 
@@ -174,7 +174,7 @@ specific SQL script file is found then Pre-Liquibase will not attempt to _also_ 
 
 
 
-=== Database platform auto-detection
+=== Database platform auto-detection [[auto_detection]]
 
 The module does not attempt to interpret the SQL you put in your SQL script files. It does, however, have a feature 
 for auto-detecting which database platform is in use. It uses this information to figure out which SQL script file to
