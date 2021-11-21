@@ -72,7 +72,7 @@ with each other.
 </dependency>
 ----
 [start=2]
-. Add SQL file(s) to `src/main/resources/preliquibase` and name them `DBENGINECODE.sql` (where 'DBENGINECODE' is 
+. Add SQL file(s) to folder `src/main/resources/preliquibase/` and name them `DBENGINECODE.sql` (where 'DBENGINECODE' is 
 one of the string codes which are supported for database engine auto-detection) or simply `default.sql` if 
 the SQL file applies generically to any type of database engine. If your Pre-Liquibase script is about ensuring a 
 schema exists (not unlikely, this is the main use-case for Pre-Liquibase) then your SQL script might look like this:
@@ -357,7 +357,7 @@ In summary:  Version 1.1.x or later is the recommended version of Pre-Liquibase 
 == Alternatives
 
 You can in theory use Spring Boot's DataSource initialization feature or JPA DDL or Hibernate DDL as described 
-https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-initialize-a-database-using-spring-jdbc[here], 
+https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.using-basic-sql-scripts[here], 
 but the Spring Boot guide clearly explains that you should not use such methods along side "a higher-level Database Migration Tool, 
 like Flyway or Liquibase" because these methods are not guaranteed to execute before Liquibase and if they happen to do so 
 at the moment they might not in the future. In constrast the Pre-Liquibase module is designed specifically 
