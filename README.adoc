@@ -38,7 +38,7 @@ If not, you should pause and ask yourself if you are doing the right thing.
 The module requires 
 
 - Java 8 or later 
-- Spring Boot 2.3 or later (see <<Spring Boot compatibility>>)
+- Spring Boot 2.5 or later (see <<Spring Boot compatibility>>)
 
 {nbsp} +
 {nbsp} +
@@ -322,35 +322,14 @@ logging.level.net.lbruun.springboot.preliquibase=TRACE
 logging.level.liquibase=TRACE
 ----
 
+Pre-Liquibase assumes that you are using auto-configuration for Liquibase as well. If you are manually
+configuring a bean of type `SpringLiquibase` then Pre-Liquibase will not fire. You can find the background
+for this explained in https://github.com/lbruun/Pre-Liquibase/issues/5[Issue #5].
 
 == Spring Boot compatibility
 
-Spring Boot 2.5 introduced changes to its auto-configuration classes for Liquibase which has necessitated two concurrent 
-release branches of the Pre-Liquibase library. Be sure to use the version of Pre-Liqquibase appropriate for your
-Spring Boot version:
-
-[cols=4*,options=header]
-|===
-|Pre-Liquibase version
-|Spring Boot compatibility
-|Git branch name
-|Description
-
-|1.0.x
-|Spring Boot 2.3, Spring Boot 2.4
-|`prior-to-spring-boot-2.5`
-|Legacy release supporting Spring Boot 2.3 and Spring Boot 2.4. This release branch will 
-continue to receive bug fixes until Spring Boot 2.4 has https://github.com/spring-projects/spring-boot/wiki/Supported-Versions[has reached end-of-life]. 
-However, new features will not be introduced on this branch.
-
-|1.1.x and later
-|Spring Boot 2.5 and later
-|`master`
-|Use this unless you absolutely *must* use an older version of Spring Boot.
-
-|===
-
-In summary:  Version 1.1.x or later is the recommended version of Pre-Liquibase but it requires Spring Boot 2.5 or later.
+Pre-Liquibase works with Spring Boot 2.5+ and has currently been tested with `2.5`, `2.6` and `2.7`. There's no reason why it 
+should not work with any future 2.x release of Spring Boot.
 
 
 
