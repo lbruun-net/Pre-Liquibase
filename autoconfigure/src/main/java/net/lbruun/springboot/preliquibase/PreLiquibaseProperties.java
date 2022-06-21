@@ -15,25 +15,23 @@
  */
 package net.lbruun.springboot.preliquibase;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import static net.lbruun.springboot.preliquibase.PreLiquibaseProperties.PROPERTIES_PREFIX;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Properties for Pre-Liquibase module.
- * 
+ *
  * @author lbruun
  */
-@ConfigurationProperties(prefix = PROPERTIES_PREFIX)
+@ConfigurationProperties(prefix = "preliquibase")
 public class PreLiquibaseProperties {
 
-    public static final String PROPERTIES_PREFIX = "preliquibase";
-    
-    
     private boolean enabled = true;
-    
+
     /**
      * Database platform code to use in the SQL scripts 
      * (such as preliquibase-${dbPlatformCode}.sql). 
@@ -58,13 +56,13 @@ public class PreLiquibaseProperties {
     /**
      * SQL scripts encoding.
      */
-    private Charset sqlScriptEncoding = StandardCharsets.UTF_8;
+    private Charset sqlScriptEncoding = UTF_8;
 
-    
     /**
      * Get the 'enabled' setting (ff the module is enabled or not).
-     * @see #setEnabled(boolean) 
-     * @return 
+     *
+     * @see #setEnabled(boolean)
+     * @return
      */
     public boolean isEnabled() {
         return enabled;
@@ -72,21 +70,21 @@ public class PreLiquibaseProperties {
 
     /**
      * Disables or enables module. Default is {@code true} (module is enabled).
-     * @param enabled 
+     *
+     * @param enabled
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-    
 
     /**
      * Gets 'continueOnError' setting.
-     * @see #setContinueOnError(boolean) 
+     *
+     * @see #setContinueOnError(boolean)
      */
     public boolean isContinueOnError() {
-        return this.continueOnError;
+        return continueOnError;
     }
-
 
     /**
      * Sets whether to stop if an error occurs while executing the SQL script.
@@ -96,18 +94,17 @@ public class PreLiquibaseProperties {
         this.continueOnError = continueOnError;
     }
 
-    
     /**
      * Gets 'separator' setting.
-     * @see #setSeparator(java.lang.String) 
+     *
+     * @see #setSeparator(java.lang.String)
      */
     public String getSeparator() {
-        return this.separator;
+        return separator;
     }
 
     /**
-     * Sets statement separator in SQL scripts. 
-     * Defaults to semi-colon if not set.
+     * Sets statement separator in SQL scripts. Defaults to semi-colon if not set.
      */
     public void setSeparator(String separator) {
         this.separator = separator;
@@ -115,17 +112,18 @@ public class PreLiquibaseProperties {
 
     /**
      * Gets 'sqlScriptEncoding'.
-     * @see #setSqlScriptEncoding(java.nio.charset.Charset) 
-     * @return 
+     *
+     * @see #setSqlScriptEncoding(java.nio.charset.Charset)
+     * @return
      */
     public Charset getSqlScriptEncoding() {
-        return this.sqlScriptEncoding;
+        return sqlScriptEncoding;
     }
 
     /**
      * Sets the file encoding for SQL script file.
      * Defaults to {@code UTF-8} if not set.
-     * @param sqlScriptEncoding 
+     * @param sqlScriptEncoding
      */
     public void setSqlScriptEncoding(Charset sqlScriptEncoding) {
         this.sqlScriptEncoding = sqlScriptEncoding;
@@ -133,13 +131,13 @@ public class PreLiquibaseProperties {
 
     /**
      * Gets 'dbPlatformCode'
-     * 
+     *
      * <p>
      * Note that this is an arbitrary value. It can be any string value.
-     * 
-     * @see #setDbPlatformCode(java.lang.String) 
-     * @return database platform code or {@code null} if the value isn't set. 
-     * 
+     *
+     * @see #setDbPlatformCode(java.lang.String)
+     * @return database platform code or {@code null} if the value isn't set.
+     *
      */
     public String getDbPlatformCode() {
         return dbPlatformCode;
@@ -148,12 +146,12 @@ public class PreLiquibaseProperties {
     /**
      * Sets to the db engine code to use when finding which
      * SQL script to execute, as in {@code preliquibase-${dbEngineCode}.sql}}
-     * 
+     *
      * <p>
      * Setting this value explicitly overrides the database platform
      * auto-detection. The value can any value; it will not be
      * validated.
-     * @param dbPlatformCode 
+     * @param dbPlatformCode
      */
     public void setDbPlatformCode(String dbPlatformCode) {
         this.dbPlatformCode = dbPlatformCode;
@@ -161,8 +159,9 @@ public class PreLiquibaseProperties {
 
     /**
      * Gets the sqlScriptReferences
-     * @see #setSqlScriptReferences(java.util.List) 
-     * @return 
+     *
+     * @see #setSqlScriptReferences(java.util.List)
+     * @return
      */
     public List<String> getSqlScriptReferences() {
         return sqlScriptReferences;
@@ -172,13 +171,13 @@ public class PreLiquibaseProperties {
      * Sets explicit locations of where to find the SQL script(s) 
      * to execute, meaning rather than finding the SQL script(s) in 
      * the default classpath location.
-     * 
+     *
      * <p>
      * When expressed as a string value it must be a comma-separated list of Spring Resource references,
      * for example {@code "file:/foo/bar/myscript1.sql,file:/foo/bar/myscript2.sql}.
      * Each resource in the list must exist, otherwise an {@link PreLiquibaseException.SqlScriptRefError}
      * exception is thrown.
-     * 
+     *
      * @param sqlScriptReferences list of Spring Resource references.
      */
     public void setSqlScriptReferences(List<String> sqlScriptReferences) {
