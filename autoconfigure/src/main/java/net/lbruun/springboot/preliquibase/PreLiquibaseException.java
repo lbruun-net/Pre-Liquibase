@@ -17,7 +17,7 @@ package net.lbruun.springboot.preliquibase;
 
 /**
  * Base class for exceptions for Pre-Liquibase module.
- * 
+ *
  * @author lbruun
  */
 public abstract class PreLiquibaseException extends RuntimeException {
@@ -28,10 +28,8 @@ public abstract class PreLiquibaseException extends RuntimeException {
 
     public PreLiquibaseException(String message, Throwable cause) {
         super(message, cause);
-
     }
 
-    
     /**
      * Thrown on certain {@link PreLiquibase} methods if the method
      * is invoked <i>prior</i> to {@link PreLiquibase#execute()}.
@@ -39,12 +37,12 @@ public abstract class PreLiquibaseException extends RuntimeException {
     public static class UninitializedError extends PreLiquibaseException {
 
         public static final UninitializedError DEFAULT = new UninitializedError("Method must not be invoked prior to execute()");
+
         public UninitializedError(String message) {
             super(message);
         }
     }
 
-    
     /**
      * Thrown if the current db platform cannot be auto-detected 
      * from a DataSource.
@@ -55,7 +53,7 @@ public abstract class PreLiquibaseException extends RuntimeException {
             super(message, cause);
         }
     }
-    
+
     /**
      * Thrown on I/O errors during the stage where placeholder values in
      * SQL script are being replaced with their resolved values.
@@ -66,7 +64,7 @@ public abstract class PreLiquibaseException extends RuntimeException {
             super(message, cause);
         }
     }
-    
+
     /**
      * Thrown when placeholder variables in SQL scripts cannot be resolved
      * or if they are circular.
@@ -77,7 +75,7 @@ public abstract class PreLiquibaseException extends RuntimeException {
             super(message, cause);
         }
     }
-    
+
     /**
      * Thrown when location of SQL scripts are
      * {@link PreLiquibaseProperties#setSqlScriptReferences(java.util.List) explicitly specified}
