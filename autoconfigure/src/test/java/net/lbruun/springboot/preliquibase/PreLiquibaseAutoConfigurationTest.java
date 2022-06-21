@@ -76,25 +76,25 @@ public class PreLiquibaseAutoConfigurationTest {
         // executes and Liquibase will therefore fail.
 
         contextRunner
-                .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-                .withPropertyValues(
-                    "spring.datasource.url=" + JDBC_URL1,
-                    "sql.script.schemaname=myschema",
-                    "spring.liquibase.default-schema=myschema")
-                .run(assertPreLiquibase(preLiquibase -> {
+            .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
+            .withPropertyValues(
+                "spring.datasource.url=" + JDBC_URL1,
+                "sql.script.schemaname=myschema",
+                "spring.liquibase.default-schema=myschema")
+            .run(assertPreLiquibase(preLiquibase -> {
 
-                    // Assert that PreLiquibase has resolved the db platform correctly
-                    assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
+                // Assert that PreLiquibase has resolved the db platform correctly
+                assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
 
-                    // Assert that something was executed.
-                    assertThat(preLiquibase.hasExecutedScripts()).isTrue();
+                // Assert that something was executed.
+                assertThat(preLiquibase.hasExecutedScripts()).isTrue();
 
-                    // Assert that only one script has executed
-                    assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
+                // Assert that only one script has executed
+                assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
 
-                    // Assert which script was executed
-                    assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase/hsqldb.sql");
-                }));
+                // Assert which script was executed
+                assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase/hsqldb.sql");
+            }));
     }
 
     @Test

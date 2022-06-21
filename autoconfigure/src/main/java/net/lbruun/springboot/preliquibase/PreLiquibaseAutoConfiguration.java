@@ -36,6 +36,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration.LiquibaseConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -216,7 +217,7 @@ public class PreLiquibaseAutoConfiguration {
             // This is important as we do not want the SpringLiquibase's
             // afterPropertiesSet method to kick in. All we are interested in
             // is to figure out which datasource Liquibase would be using.
-            final LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration =
+            final LiquibaseConfiguration liquibaseConfiguration =
                 new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
             final SpringLiquibase liquibase =
                 liquibaseConfiguration.liquibase(dataSource, liquibaseDataSource);

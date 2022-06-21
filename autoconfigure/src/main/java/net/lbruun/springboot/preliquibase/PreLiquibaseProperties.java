@@ -15,13 +15,23 @@
  */
 package net.lbruun.springboot.preliquibase;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNullElseGet;
+import static net.lbruun.springboot.preliquibase.utils.LiquibaseUtils.getLiquibaseDatabaseShortName;
 
 import java.nio.charset.Charset;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+
+import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptRefError;
 
 /**
  * Properties for Pre-Liquibase module.
@@ -31,6 +41,10 @@ import org.springframework.core.io.Resource;
 @ConfigurationProperties(prefix = "preliquibase")
 public class PreLiquibaseProperties {
     
+    @Autowired
+    private ResourceLoader resourceLoader;
+    @Autowired
+    private DataSource dataSource;
     private boolean enabled = true;
 
     /**
@@ -141,7 +155,7 @@ public class PreLiquibaseProperties {
      *
      */
     public String getDbPlatformCode() {
-        return dbPlatformCode;
+        return requireNonNullElseGet(dbPlatformCode, () -> getLiquibaseDatabaseShortName(dataSource));
     }
 
     /**
@@ -209,5 +223,24 @@ public class PreLiquibaseProperties {
      */
     public void setSqlScriptReferences(List<Resource> sqlScriptReferences) {
         this.sqlScriptReferences = sqlScriptReferences;
+    }
+
+    public List<Resource> getScripts() {
+        if (nonNull(sqlScriptReferences)) {
+            sqlScriptReferences.stream().filter(r -> !r.exists()).findFirst().ifPresent(r -> {
+                throw new SqlScriptRefError(format("Resource \"%s\" is invalid or cannot be found", r));
+            });
+            return sqlScriptReferences;
+        }
+
+        final Resource typedFallback = resourceLoader
+                .getResource(format("classpath:preliquibase/%s.sql", getDbPlatformCode()));
+        final Resource defaultFallback = resourceLoader.getResource("classpath:preliquibase/default.sql");
+
+        return List.of(typedFallback.exists() ? typedFallback : defaultFallback);
+    }
+
+    public DataSource getDatasource() {
+        return dataSource;
     }
 }
