@@ -16,17 +16,27 @@ limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>net.lbruun.springboot</groupId>
         <artifactId>preliquibase-spring-boot-parent</artifactId>
+<<<<<<< Upstream, based on master
         <version>1.2.3-SNAPSHOT</version>
+=======
+        <version>1.1.2-SNAPSHOT</version>
+>>>>>>> a7dced2 Bump Spring Boot => 2.7.0
     </parent>
+
     <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
     <packaging>jar</packaging>
     <name>Spring Boot AutoConfiguration :: Pre-Liquibase AutoConfiguration</name>
+<<<<<<< Upstream, based on master
+=======
+
+>>>>>>> a7dced2 Bump Spring Boot => 2.7.0
     <description>Autoconfiguration for Pre-Liquibase</description>
 
-    <dependencies>        
+    <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
@@ -42,24 +52,32 @@ limitations under the License.
             <artifactId>liquibase-core</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <scope>test</scope>
         </dependency>
+<<<<<<< Upstream, based on master
+=======
+
+>>>>>>> a7dced2 Bump Spring Boot => 2.7.0
     </dependencies>
-    
+
     <build>
         <plugins>
+<<<<<<< Upstream, based on master
+=======
+
+>>>>>>> a7dced2 Bump Spring Boot => 2.7.0
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>  <!-- Must be at least 2.22 for Junit 5 -->
+                <version>2.22.2</version> <!-- Must be at least 2.22 for Junit 5 -->
             </plugin>
 
             <plugin>
@@ -91,12 +109,12 @@ limitations under the License.
                         </tag>
 
                         <tag><name>param</name></tag>
-			<tag><name>return</name></tag>
-			<tag><name>throws</name></tag>
-			<tag><name>since</name></tag>
-			<tag><name>version</name></tag>
-			<tag><name>serialData</name></tag>
-			<tag><name>see</name></tag>
+                        <tag><name>return</name></tag>
+                        <tag><name>throws</name></tag>
+                        <tag><name>since</name></tag>
+                        <tag><name>version</name></tag>
+                        <tag><name>serialData</name></tag>
+                        <tag><name>see</name></tag>
                     </tags>
                 </configuration>
             </plugin>
