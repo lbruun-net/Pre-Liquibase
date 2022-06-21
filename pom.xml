@@ -16,59 +16,56 @@ limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" child.project.url.inherit.append.path="false">
     <modelVersion>4.0.0</modelVersion>
+    
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-parent</artifactId>
     <version>1.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
+    
     <modules>
         <module>autoconfigure</module>
         <module>example</module>
         <module>starter</module>
     </modules>
-    <name>Spring Boot AutoConfiguration :: Pre-Liquibase Parent</name>
     
+    <name>Spring Boot AutoConfiguration :: Pre-Liquibase Parent</name>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.scm.id>github.com-lbruun.net</project.scm.id>
-        <spring.boot.version>2.5.2</spring.boot.version>
+        <spring.boot.version>2.7.0</spring.boot.version>
     </properties>
-
-
 
     <url>https://github.com/lbruun/Pre-Liquibase</url>
 
-    <description>
-        Parent for Pre-Liquibase Spring Boot module
-    </description>
+    <description>Parent for Pre-Liquibase Spring Boot module</description>
 
     <organization>
         <name>lbruun.net</name>
     </organization>
-    
-    <licenses>        
+
+    <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
             <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-    
+
     <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
         <connection>scm:git:https://github.com/lbruun/Pre-Liquibase.git</connection>
         <developerConnection>scm:git:https://github.com/lbruun/Pre-Liquibase.git</developerConnection>
         <url>https://github.com/lbruun/Pre-Liquibase</url>
-      <tag>HEAD</tag>
-  </scm>    
+        <tag>HEAD</tag>
+    </scm>
 
- 
     <distributionManagement>
         <repository>
             <id>ossrh-lbruun</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-    </distributionManagement>    
-
+    </distributionManagement>
 
     <developers>
         <developer>
@@ -88,13 +85,21 @@ limitations under the License.
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>net.lbruun.springboot</groupId>
+                <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>net.lbruun.springboot</groupId>
+                <artifactId>preliquibase-spring-boot-starter</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
-
-
     <build>
-        
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -103,7 +108,7 @@ limitations under the License.
                 </plugin>
             </plugins>
         </pluginManagement>
-        
+
         <plugins>
             <!--   Required for publishing to Maven Central  -->
             <plugin>
@@ -123,7 +128,7 @@ limitations under the License.
                 <artifactId>flatten-maven-plugin</artifactId>
                 <version>1.2.5</version>
                 <configuration>
-                     <flattenMode>ossrh</flattenMode>
+                    <flattenMode>ossrh</flattenMode>
                 </configuration>
                 <executions>
                     <!-- enable flattening -->
@@ -144,7 +149,7 @@ limitations under the License.
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- Skip deploying 'parent' (current project) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -157,9 +162,8 @@ limitations under the License.
         </plugins>
     </build>
 
-
-    <profiles>        
-        <profile> 
+    <profiles>
+        <profile>
             <id>release-to-central</id>
             <build>
                 <plugins>
@@ -188,7 +192,7 @@ limitations under the License.
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>                    
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
