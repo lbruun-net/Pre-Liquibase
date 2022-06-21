@@ -36,7 +36,7 @@ limitations under the License.
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
             <version>${project.version}</version>
         </dependency>
