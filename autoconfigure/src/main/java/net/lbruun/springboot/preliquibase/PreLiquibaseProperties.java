@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.core.io.Resource;
 
 /**
  * Properties for Pre-Liquibase module.
@@ -42,8 +42,7 @@ public class PreLiquibaseProperties {
     /**
      * SQL script resource references.
      */
-    @NotEmpty(message="sqlScriptReferences must not be empty")
-    private List<String> sqlScriptReferences = Collections.singletonList(DEFAULT_SCRIPT_LOCATION);
+    private List<Resource> sqlScriptReferences;
 
     /**
      * Whether to stop if an error occurs while executing the SQL script.
@@ -165,7 +164,7 @@ public class PreLiquibaseProperties {
      * @see #setSqlScriptReferences(java.util.List)
      * @return
      */
-    public List<String> getSqlScriptReferences() {
+    public List<Resource> getSqlScriptReferences() {
         return sqlScriptReferences;
     }
 
@@ -208,7 +207,7 @@ public class PreLiquibaseProperties {
      * 
      * @param sqlScriptReferences list of Spring Resource references.
      */
-    public void setSqlScriptReferences(List<String> sqlScriptReferences) {
+    public void setSqlScriptReferences(List<Resource> sqlScriptReferences) {
         this.sqlScriptReferences = sqlScriptReferences;
     }
 }

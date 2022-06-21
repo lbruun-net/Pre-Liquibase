@@ -16,13 +16,11 @@
 package net.lbruun.springboot.preliquibase;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.stream.Collectors.toMap;
 import static net.lbruun.springboot.preliquibase.PreLiquibaseException.UninitializedError.DEFAULT;
-import static net.lbruun.springboot.preliquibase.PreLiquibaseProperties.PROPERTIES_PREFIX;
 import static net.lbruun.springboot.preliquibase.utils.LiquibaseUtils.getLiquibaseDatabaseShortName;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.config.PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX;
@@ -48,7 +46,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.config.SortedResourcesFactoryBean;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.datasource.init.ScriptException;
@@ -137,10 +134,10 @@ public class PreLiquibase {
     public synchronized void execute() {
         if (!hasExecuted) {
             hasExecuted = true;
-            this.dbPlatformCode = resolveDbPlatformCode();
-            this.unfilteredResources = getScripts(this.properties.getSqlScriptReferences());
-            this.filteredResources = getFilteredResources(unfilteredResources);
-            this.hasExecutedScripts = executeSQLScripts();
+            dbPlatformCode = resolveDbPlatformCode();
+            unfilteredResources = getScripts(properties.getSqlScriptReferences());
+            filteredResources = getFilteredResources(unfilteredResources);
+            hasExecutedScripts = executeSQLScripts();
         }
     }
 
@@ -258,49 +255,18 @@ public class PreLiquibase {
         return requireNonNullElseGet(properties.getDbPlatformCode(), this::getDbPlatformCodeFromDataSource);
     }
 
+    private List<Resource> getScripts(List<Resource> resources) {
+      if (nonNull(resources)) {
+          resources.stream().filter(r -> !r.exists()).findFirst().ifPresent(r -> {
+              throw new SqlScriptRefError(format("Resource \"%s\" is invalid or cannot be found", r));
+          });
+          return resources;
+      }
 
-    private List<Resource> getScripts(List<String> resources) {
-        // Bean Validation ensures us that 'resources' is non-empty.
-        if (resources.size() == 1 && (resources.get(0).endsWith("/") || resources.get(0).endsWith("\\"))) {
-            String pathLoc = resources.get(0);
-            List<String> absSqlFileLocations = new ArrayList<>();
-            absSqlFileLocations.add(pathLoc + this.dbPlatformCode + ".sql");
-            absSqlFileLocations.add(pathLoc + "default.sql");
-            return getResourcesFromStringLocations(absSqlFileLocations, false, true);
-        } else {
-            // Specific, absolute resource(s)
-            return getResourcesFromStringLocations(resources, true, false);
-        }
-    }
+      final Resource typedFallback = resourceLoader.getResource(format("classpath:preliquibase/%s.sql", dbPlatformCode));
+      final Resource defaultFallback = resourceLoader.getResource("classpath:preliquibase/default.sql");
 
-    private List<Resource> getResourcesFromStringLocations(
-            List<String> locations, 
-            boolean validateExistence, 
-            boolean onlyUseFirstScript) {
-        final List<Resource> resources = new ArrayList<>();
-        for (final String location : locations) {
-            for (final Resource resource : doGetResources(location)) {
-                if (resource.exists()) {
-                    resources.add(resource);
-                    if (onlyUseFirstScript) {
-                        return resources;
-                    }
-                } else if (validateExistence) {
-                    throw new SqlScriptRefError(format("Resource \"%s\" is invalid or cannot be found", location));
-                }
-            }
-        }
-        return resources;
-    }
-
-    private Resource[] doGetResources(String location) {
-        try {
-            final SortedResourcesFactoryBean factory = new SortedResourcesFactoryBean(resourceLoader, singletonList(location));
-            factory.afterPropertiesSet();
-            return factory.getObject();
-        } catch (final Exception ex) {
-            throw new IllegalStateException(format("Error when creating Resource object from \"%s\"", location), ex);
-        }
+      return List.of(typedFallback.exists() ? typedFallback : defaultFallback);
     }
 
     private List<Resource> getFilteredResources(List<Resource> resources) {
