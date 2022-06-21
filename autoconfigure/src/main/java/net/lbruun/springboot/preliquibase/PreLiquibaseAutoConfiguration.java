@@ -219,8 +219,7 @@ public class PreLiquibaseAutoConfiguration {
                 liquibaseConfiguration.liquibase(dataSource, liquibaseDataSource);
 
             // Sanity check
-            requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");
-            dataSourceToUse = liquibase.getDataSource();
+            dataSourceToUse = requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");
         }
 
         @Override
