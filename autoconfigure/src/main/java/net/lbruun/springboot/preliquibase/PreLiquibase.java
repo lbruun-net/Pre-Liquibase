@@ -18,7 +18,6 @@ package net.lbruun.springboot.preliquibase;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNullElseGet;
 import static java.util.stream.Collectors.toMap;
 import static net.lbruun.springboot.preliquibase.PreLiquibaseException.UninitializedError.DEFAULT;
 import static net.lbruun.springboot.preliquibase.utils.LiquibaseUtils.getLiquibaseDatabaseShortName;
@@ -43,17 +42,17 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.datasource.init.ScriptException;
 import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 import org.springframework.util.StreamUtils;
 
+import net.lbruun.springboot.preliquibase.PreLiquibaseException.ResolveDbPlatformError;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptReadError;
-import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptRefError;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptVarError;
 
 /**
@@ -103,11 +102,8 @@ public class PreLiquibase {
 
     private final DataSource dataSource;
     private final PreLiquibaseProperties properties;
-    private final ResourceLoader resourceLoader;
     private final Environment environment;
-    private List<Resource> unfilteredResources;
     private List<Resource> filteredResources;
-    private String dbPlatformCode;
     private boolean hasExecutedScripts;
     private volatile boolean hasExecuted = false;
 
@@ -125,7 +121,6 @@ public class PreLiquibase {
         this.environment = environment;
         this.dataSource = dataSource;
         this.properties = properties;
-        this.resourceLoader = requireNonNullElseGet(resourceLoader, () -> new DefaultResourceLoader(null));
     }
 
     /**
@@ -148,9 +143,7 @@ public class PreLiquibase {
     public synchronized void execute() {
         if (!hasExecuted) {
             hasExecuted = true;
-            dbPlatformCode = resolveDbPlatformCode();
-            unfilteredResources = getScripts(properties.getSqlScriptReferences());
-            filteredResources = getFilteredResources(unfilteredResources);
+            filteredResources = getFilteredResources(properties.getScripts());
             hasExecutedScripts = executeSQLScripts();
         }
     }
@@ -161,7 +154,7 @@ public class PreLiquibase {
      * @return datasource
      */
     public DataSource getDataSource() {
-        return dataSource;
+        return properties.getDatasource();
     }
 
     /**
@@ -174,10 +167,7 @@ public class PreLiquibase {
      *      invoked prior to {@link #execute()}.
      */
     public List<Resource> getUnfilteredResources() {
-        if (!hasExecuted) {
-            throw DEFAULT;
-        }
-        return unfilteredResources;
+        return properties.getScripts();
     }
 
     /**
@@ -208,10 +198,7 @@ public class PreLiquibase {
      *      invoked prior to {@link #execute()}.
      */
     public String getDbPlatformCode() {
-        if (!hasExecuted) {
-            throw DEFAULT;
-        }
-        return dbPlatformCode;
+        return properties.getDbPlatformCode();
     }
 
     /**
@@ -258,29 +245,11 @@ public class PreLiquibase {
     /**
      * Auto-detect the current database platform
      */
-    private String getDbPlatformCodeFromDataSource() throws PreLiquibaseException.ResolveDbPlatformError {
+    private String getDbPlatformCodeFromDataSource() throws ResolveDbPlatformError {
         logger.debug("Determining db platform from DataSource");
         final String dbPlatformCodeCandidate = getLiquibaseDatabaseShortName(dataSource);
         logger.debug("Determined database platform as '{}'", dbPlatformCodeCandidate);
         return dbPlatformCodeCandidate;
-    }
-
-    private String resolveDbPlatformCode() {
-        return requireNonNullElseGet(properties.getDbPlatformCode(), this::getDbPlatformCodeFromDataSource);
-    }
-
-    private List<Resource> getScripts(List<Resource> resources) {
-        if (nonNull(resources)) {
-            resources.stream().filter(r -> !r.exists()).findFirst().ifPresent(r -> {
-                throw new SqlScriptRefError(format("Resource \"%s\" is invalid or cannot be found", r));
-            });
-            return resources;
-        }
-
-        final Resource typedFallback = resourceLoader.getResource(format("classpath:preliquibase/%s.sql", dbPlatformCode));
-        final Resource defaultFallback = resourceLoader.getResource("classpath:preliquibase/default.sql");
-
-        return List.of(typedFallback.exists() ? typedFallback : defaultFallback);
     }
 
     private List<Resource> getFilteredResources(List<Resource> resources) {
@@ -345,7 +314,7 @@ public class PreLiquibase {
      * PlaceholderResolver which can optionally use a backup property in-lieu of
      * another property if that property isn't available.
      */
-    private static class PreLiquibasePlaceholderResolver implements PropertyPlaceholderHelper.PlaceholderResolver {
+    private static class PreLiquibasePlaceholderResolver implements PlaceholderResolver {
 
         private final Environment environment;
         private final Map<String, String> defaults;
