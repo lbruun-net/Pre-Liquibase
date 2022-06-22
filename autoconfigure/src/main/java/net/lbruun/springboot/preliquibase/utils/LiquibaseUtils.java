@@ -15,6 +15,11 @@
  */
 package net.lbruun.springboot.preliquibase.utils;
 
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
