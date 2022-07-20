@@ -113,7 +113,7 @@ public class PreLiquibase {
      * @param resourceLoader the resource loader to use for locating (and
      *     loading) SQL scripts. Can be null. This is typically your {@code ApplicationContext}.
      */
-    PreLiquibase(Environment environment, DataSource dataSource, PreLiquibaseProperties properties, ResourceLoader resourceLoader) {
+    public PreLiquibase(Environment environment, DataSource dataSource, PreLiquibaseProperties properties, ResourceLoader resourceLoader) {
         this.environment = environment;
         this.dataSource = dataSource;
         this.properties = properties;
