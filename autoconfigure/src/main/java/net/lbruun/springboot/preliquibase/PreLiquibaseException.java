@@ -79,7 +79,7 @@ public abstract class PreLiquibaseException extends RuntimeException {
     }
     
     /**
-     * Thrown when location of SQL scripts are
+     * Thrown when location of individual SQL scripts are
      * {@link PreLiquibaseProperties#setSqlScriptReferences(java.util.List) explicitly specified}
      * and one or more of the references is invalid (file not found, incorrect
      * specification of Spring Resource reference, etc).

@@ -17,33 +17,39 @@ package net.lbruun.springboot.preliquibase;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
 import static net.lbruun.springboot.preliquibase.PreLiquibaseProperties.PROPERTIES_PREFIX;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties for Pre-Liquibase module.
  * 
  * @author lbruun
  */
+@Validated
 @ConfigurationProperties(prefix = PROPERTIES_PREFIX)
 public class PreLiquibaseProperties {
 
     public static final String PROPERTIES_PREFIX = "preliquibase";
-    
+    public static final String DEFAULT_SCRIPT_LOCATION
+            = "classpath:preliquibase/";
     
     private boolean enabled = true;
     
     /**
      * Database platform code to use in the SQL scripts 
-     * (such as preliquibase-${dbPlatformCode}.sql). 
+     * (such as preliquibase/${dbPlatformCode}.sql). 
      */
     private String dbPlatformCode;
 
     /**
      * SQL script resource references.
      */
-    private List<String> sqlScriptReferences;
+    @NotEmpty(message="sqlScriptReferences must not be empty")
+    private List<String> sqlScriptReferences = Collections.singletonList(DEFAULT_SCRIPT_LOCATION);
 
     /**
      * Whether to stop if an error occurs while executing the SQL script.
@@ -62,7 +68,7 @@ public class PreLiquibaseProperties {
 
     
     /**
-     * Get the 'enabled' setting (ff the module is enabled or not).
+     * Get the 'enabled' setting (if the module is enabled or not).
      * @see #setEnabled(boolean) 
      * @return 
      */
@@ -90,7 +96,7 @@ public class PreLiquibaseProperties {
 
     /**
      * Sets whether to stop if an error occurs while executing the SQL script.
-     * Default to {@code false} if not set.
+     * Default value is: {@code false}.
      */
     public void setContinueOnError(boolean continueOnError) {
         this.continueOnError = continueOnError;
@@ -146,8 +152,8 @@ public class PreLiquibaseProperties {
     }
 
     /**
-     * Sets to the db engine code to use when finding which
-     * SQL script to execute, as in {@code preliquibase-${dbEngineCode}.sql}}
+     * Sets the db engine code to use when finding which
+     * SQL script to execute, as in {@code preliquibase/${dbEngineCode}.sql}}
      * 
      * <p>
      * Setting this value explicitly overrides the database platform
@@ -169,15 +175,41 @@ public class PreLiquibaseProperties {
     }
 
     /**
-     * Sets explicit locations of where to find the SQL script(s) 
-     * to execute, meaning rather than finding the SQL script(s) in 
-     * the default classpath location.
+     * Sets location(s) of where to find the SQL script(s) to execute.
      * 
      * <p>
-     * When expressed as a string value it must be a comma-separated list of Spring Resource references,
-     * for example {@code "file:/foo/bar/myscript1.sql,file:/foo/bar/myscript2.sql}.
-     * Each resource in the list must exist, otherwise an {@link PreLiquibaseException.SqlScriptRefError}
-     * exception is thrown.
+     * The value is interpreted slightly differently depending on its
+     * content:
+     * <ul>
+     *   <li>If the value is a Spring Resource textual reference which ends with {@code "/"}:
+     *       In this case, the reference is expected to be a folder reference
+     *       where SQL scripts can be found. From this folder:
+     *       If a file named "{@link #setDbPlatformCode(java.lang.String) 
+     *       DBPLATFORMCODE}{@code .sql}" (e.g. "{@code postgresql.sql}") exists then 
+     *       that will be used. If no such file is found then a file named 
+     *       "{@code default.sql}" is used. 
+     *       If neither file is found then no action will be taken, similarly
+     *       to {@link #setEnabled(boolean) disabling} the module.
+     *       <br>
+     *       Example values:<br>
+     *       {@code "classpath:my-folder/"} (load from classpath folder).<br>
+     *       {@code "file:c:/config/sql-scripts/"} (load from file system folder, Windows).<br>
+     *       {@code "file:/app/etc/sql-scripts/"} (load from file system folder, Linux).<br>
+     *       <br>
+     *   </li>
+     *   <li>Otherwise: The value is interpreted as a comma-separated list of 
+     *       Spring Resource textual references to <i>specific</i> SQL files. Each 
+     *       script file will be executed in the order they are listed. Before
+     *       execution of any of of the script files it is checked if all files
+     *       mentioned in the list actually exists. If not, an 
+     *       {@link PreLiquibaseException.SqlScriptRefError} exception is thrown.
+     *       <br>
+     *       Example value: {@code "file:/foo/bar/myscript1.sql,file:/foo/bar/myscript2.sql"}.
+     *   </li>
+     * </ul>
+     * 
+     * <p>
+     * Default value: {@link #DEFAULT_SCRIPT_LOCATION}.
      * 
      * @param sqlScriptReferences list of Spring Resource references.
      */
