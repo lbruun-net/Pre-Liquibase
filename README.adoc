@@ -156,18 +156,28 @@ Rules for the file are:
 
 === How the module locates SQL script files
 
-There are two ways SQL scripts are located by Pre-Liquibase:
+Pre-Liquibase locates the SQL script(s) to execute based on the value of the `sqlScriptReferences` 
+configuration property. The default for this property is `classpath:/preliquibase/`.
 
-1. From classpath: If a file named `preliquibase/DBPLATFORMCODE.sql` exists it will be executed. DBPLATFORMCODE is a string code 
-representing the type of database in use. The module will auto-detect the database platform, but you can optionally override 
-the value with the `dbPlatformCode` configuration property. If no such file `preliquibase/DBPLATFORMCODE.sql` file exists the
-module will execute a file named `preliquibase/default.sql` if it exists.
+In general, `sqlScriptReferences` is interpreted as a comma-separated list of 
+https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-resource-strings[Spring Resource textual
+references]. It can be configured to either "folder mode" or "file mode":
 
-2. If the property `sqlScriptReferences` has been set then that takes precedence over (1). The value of this property is expected
-to be a comma-separated list of https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-resource-strings[Spring Resource references]
-to SQL script files. All of the SQL script files in the list will be executed, in the order they are listed.
 
-NOTE: The way SQL script files are located and named is heavily inspired by 
+1. Folder mode: Configure `sqlScriptReferences` to a single value ending in the "/" character.
+In this mode the value will be interpreted as a folder location where SQL scripts to be executed
+are found. From this folder, if a file named `preliquibase/DBPLATFORMCODE.sql` exists, it will be executed. 
+`DBPLATFORMCODE` is a string code representing the type of database in use. The module will <<auto_detection,auto-detect>>
+the database platform,  but you can optionally override the value with the `dbPlatformCode` configuration property. If no such file 
+`preliquibase/DBPLATFORMCODE.sql` file exists the module will execute a file named `preliquibase/default.sql` if it exists.
+If neither such file exists in the folder then no action will be taken (not an error).
+
+2. File mode: Configure `sqlScriptReferences` to be a comma-separated list of individual SQL script files.
+All of the SQL script files in the list will be executed, in the order they are listed.
+Prior to execution of any SQL script file it is checked if all files mentioned actually exist, if not
+a `PreLiquibaseException.SqlScriptRefError` is thrown.
+
+NOTE: The way SQL script files are located and named is somewhat inspired by 
 https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-initialize-a-database-using-spring-jdbc[Spring Boot's DataSource Initialization feature]. 
 However, there are some important differences: Pre-Liquibase auto-detects which database platform you are using and secondly if a platform 
 specific SQL script file is found then Pre-Liquibase will not attempt to _also_ execute the platform generic file (`default.sql`).

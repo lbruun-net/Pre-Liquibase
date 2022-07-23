@@ -141,10 +141,7 @@ public class PreLiquibase {
         if (!hasExecuted) {
             hasExecuted = true;
             this.dbPlatformCode = resolveDbPlatformCode();
-            this.unfilteredResources = getScripts(
-                    PreLiquibaseProperties.PROPERTIES_PREFIX + ".sqlScriptReferences",
-                    this.properties.getSqlScriptReferences(),
-                    "preliquibase");
+            this.unfilteredResources = getScripts(this.properties.getSqlScriptReferences());
             this.filteredResources = getFilteredResources(unfilteredResources);
             this.hasExecutedScripts = executeSQLScripts();
         }
@@ -272,19 +269,21 @@ public class PreLiquibase {
     }
 
 
-    private List<Resource> getScripts(String propertyName, List<String> resources, String fallback) {
-        if (resources != null) {
-            return getResourcesFromStringLocations(propertyName, resources, true, false);
+    private List<Resource> getScripts(List<String> resources) {
+        // Bean Validation ensures us that 'resources' is non-empty.
+        if (resources.size() == 1 && (resources.get(0).endsWith("/") || resources.get(0).endsWith("\\"))) {
+            String pathLoc = resources.get(0);
+            List<String> absSqlFileLocations = new ArrayList<>();
+            absSqlFileLocations.add(pathLoc + this.dbPlatformCode + ".sql");
+            absSqlFileLocations.add(pathLoc + "default.sql");
+            return getResourcesFromStringLocations(absSqlFileLocations, false, true);
+        } else {
+            // Specific, absolute resource(s)
+            return getResourcesFromStringLocations(resources, true, false);
         }
-
-        List<String> fallbackResources = new ArrayList<>();
-        fallbackResources.add("classpath*:preliquibase/" + this.dbPlatformCode + ".sql");
-        fallbackResources.add("classpath*:preliquibase/default.sql");
-        return getResourcesFromStringLocations(null, fallbackResources, false, true);
     }
 
     private List<Resource> getResourcesFromStringLocations(
-            String propertyName, 
             List<String> locations, 
             boolean validateExistence, 
             boolean onlyUseFirstScript) {
