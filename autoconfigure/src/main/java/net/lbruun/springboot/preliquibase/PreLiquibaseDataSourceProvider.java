@@ -15,17 +15,10 @@
  */
 package net.lbruun.springboot.preliquibase;
 
-import java.util.Objects;
 import javax.sql.DataSource;
-import liquibase.integration.spring.SpringLiquibase;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
-import org.springframework.lang.NonNull;
 
 /**
- * Provides the {@code DataSource} to use for Pre-Liquibase SQL script execution.
+ * Provides the {@code DataSource} to use for Pre-Liquibase execution.
  *
  * @author lbruun
  */
