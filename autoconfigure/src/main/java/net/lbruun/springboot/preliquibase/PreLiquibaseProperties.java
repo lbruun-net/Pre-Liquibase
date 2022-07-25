@@ -40,8 +40,8 @@ public class PreLiquibaseProperties {
     private boolean enabled = true;
     
     /**
-     * Database platform code to use in the SQL scripts 
-     * (such as preliquibase/${dbPlatformCode}.sql). 
+     * Database platform code to use when choosing which SQL script files
+     * to execute (such as {@code preliquibase/${dbPlatformCode}.sql}). 
      */
     private String dbPlatformCode;
 
