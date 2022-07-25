@@ -17,7 +17,7 @@ package net.lbruun.springboot.preliquibase;
 
 /**
  * Base class for exceptions for Pre-Liquibase module.
- * 
+ *
  * @author lbruun
  */
 public abstract class PreLiquibaseException extends RuntimeException {
@@ -31,23 +31,22 @@ public abstract class PreLiquibaseException extends RuntimeException {
 
     }
 
-    
     /**
-     * Thrown on certain {@link PreLiquibase} methods if the method
-     * is invoked <i>prior</i> to {@link PreLiquibase#execute()}.
+     * Thrown on certain {@link PreLiquibase} methods if the method is invoked
+     * <i>prior</i> to {@link PreLiquibase#execute()}.
      */
     public static class UninitializedError extends PreLiquibaseException {
 
         public static final UninitializedError DEFAULT = new UninitializedError("Method must not be invoked prior to execute()");
+
         public UninitializedError(String message) {
             super(message);
         }
     }
 
-    
     /**
-     * Thrown if the current db platform cannot be auto-detected 
-     * from a DataSource.
+     * Thrown if the current db platform cannot be auto-detected from a
+     * DataSource.
      */
     public static class ResolveDbPlatformError extends PreLiquibaseException {
 
@@ -55,10 +54,10 @@ public abstract class PreLiquibaseException extends RuntimeException {
             super(message, cause);
         }
     }
-    
+
     /**
-     * Thrown on I/O errors during the stage where placeholder values in
-     * SQL script are being replaced with their resolved values.
+     * Thrown on I/O errors during the stage where placeholder values in SQL
+     * script are being replaced with their resolved values.
      */
     public static class SqlScriptReadError extends PreLiquibaseException {
 
@@ -66,10 +65,10 @@ public abstract class PreLiquibaseException extends RuntimeException {
             super(message, cause);
         }
     }
-    
+
     /**
-     * Thrown when placeholder variables in SQL scripts cannot be resolved
-     * or if they are circular.
+     * Thrown when placeholder variables in SQL scripts cannot be resolved or if
+     * they are circular.
      */
     public static class SqlScriptVarError extends PreLiquibaseException {
 
@@ -77,7 +76,7 @@ public abstract class PreLiquibaseException extends RuntimeException {
             super(message, cause);
         }
     }
-    
+
     /**
      * Thrown when location of individual SQL scripts are
      * {@link PreLiquibaseProperties#setSqlScriptReferences(java.util.List) explicitly specified}
@@ -90,5 +89,4 @@ public abstract class PreLiquibaseException extends RuntimeException {
             super(message);
         }
     }
-
 }
