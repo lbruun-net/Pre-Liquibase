@@ -18,7 +18,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-parent</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>autoconfigure</module>
@@ -33,7 +33,7 @@ limitations under the License.
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.scm.id>github.com-lbruun.net</project.scm.id>
-        <spring.boot.version>2.5.2</spring.boot.version>
+        <spring.boot.version>2.6.10</spring.boot.version>
     </properties>
 
 
