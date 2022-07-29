@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.lbruun.springboot.preliquibase;
+package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
-import javax.sql.DataSource;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * Provides the {@code DataSource} to use for Pre-Liquibase execution.
- *
- * @author lbruun
+ * JPA Repository for 'AppEvent' entity.
  */
-public interface PreLiquibaseDataSourceProvider {
+@Repository
+public interface AppEventRepo extends JpaRepository<AppEvent, Long> {
 
     /**
-     * Gets the DataSource to use for Pre-Liquibase execution.
-     * @return a non-null value
+     * Gets the 20 latest events in reverse order (latest first)
      */
-    DataSource getDataSource();
+    List<AppEvent> findTop20ByOrderByEventTimeDesc();
 }

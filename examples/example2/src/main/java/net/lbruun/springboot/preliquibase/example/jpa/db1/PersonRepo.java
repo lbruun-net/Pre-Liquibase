@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.lbruun.springboot.preliquibase;
+package net.lbruun.springboot.preliquibase.example.jpa.db1;
 
-import javax.sql.DataSource;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * Provides the {@code DataSource} to use for Pre-Liquibase execution.
- *
- * @author lbruun
+ * JPA Repository for 'AppEvent' entity.
  */
-public interface PreLiquibaseDataSourceProvider {
-
-    /**
-     * Gets the DataSource to use for Pre-Liquibase execution.
-     * @return a non-null value
-     */
-    DataSource getDataSource();
+@Repository
+public interface PersonRepo extends JpaRepository<Person, Long> {
 }

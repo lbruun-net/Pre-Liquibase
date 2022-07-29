@@ -48,10 +48,9 @@ import org.springframework.context.annotation.ConfigurationCondition.Configurati
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 
-
 /**
  * Auto-configuration for Pre-Liquibase.
- * 
+ *
  * @author lbruun
  */
 @Configuration(proxyBeanMethods = false)
@@ -62,7 +61,7 @@ import org.springframework.lang.NonNull;
 @AutoConfigureBefore({LiquibaseAutoConfiguration.class})
 @EnableConfigurationProperties({DataSourceProperties.class, LiquibaseProperties.class, PreLiquibaseProperties.class})
 public class PreLiquibaseAutoConfiguration {
-    
+
     Logger logger = LoggerFactory.getLogger(PreLiquibaseAutoConfiguration.class);
 
     /**
@@ -83,11 +82,11 @@ public class PreLiquibaseAutoConfiguration {
         return new DefaultPreLiquibaseDataSourceProvider(
                 liquibaseProperties, dataSourceProperties, dataSource, liquibaseDataSource);
     }
-        
+
     /**
-     * Create and executes PreLiquibase bean.
-     * The returned object is initialized, meaning {@link PreLiquibase#execute() execute()} 
-     * has been invoked.
+     * Create and executes PreLiquibase bean. The returned object is
+     * initialized, meaning {@link PreLiquibase#execute() execute()} has been
+     * invoked.
      */
     @Bean
     public PreLiquibase preLiquibase(
@@ -106,18 +105,14 @@ public class PreLiquibaseAutoConfiguration {
         return preLiquibase;
     }
 
-    
-    
     /**
      * {@link BeanFactoryPostProcessor} used to dynamically declare that all
      * {@code SpringLiquibase} beans should depend on bean of type
-     * "PreLiquibase".
-     * This ensures that we get the Pre-Liquibase beans executed 
-     * <i>before</i> the standard Liquibase bean. 
-     * Note that rather than declaring that Pre-Liquibase must execute
-     * before Liquibase, we declare the opposite: that Liquibase 
-     * must execute after Pre-Liquibase.
-     * 
+     * "PreLiquibase". This ensures that we get the Pre-Liquibase beans executed
+     * <i>before</i> the standard Liquibase bean. Note that rather than
+     * declaring that Pre-Liquibase must execute before Liquibase, we declare
+     * the opposite: that Liquibase must execute after Pre-Liquibase.
+     *
      */
     @Configuration()
     @ConditionalOnClass(SpringLiquibase.class)
@@ -132,12 +127,9 @@ public class PreLiquibaseAutoConfiguration {
         }
     }
 
-    
-    
-    
     /**
-     * Condition that says that either at least one DataSource bean must exist or
-     * the user must have declared explicitly a JDBC URL for use with
+     * Condition that says that either at least one DataSource bean must exist
+     * or the user must have declared explicitly a JDBC URL for use with
      * Liquibase.
      */
     static final class LiquibaseDataSourceCondition extends AnyNestedCondition {
@@ -154,14 +146,12 @@ public class PreLiquibaseAutoConfiguration {
         private static final class LiquibaseUrlCondition {
         }
     }
-    
 
     /**
      * Condition that says that both of the properties
-     * 
-     *    'preliquibase.enabled'
-     *    'spring.liquibase.enabled'
-     * 
+     *
+     * 'preliquibase.enabled' 'spring.liquibase.enabled'
+     *
      * must not have a value of "false"Â´or the property must be absent.
      */
     static final class EnabledCondition extends AllNestedConditions {
@@ -170,7 +160,6 @@ public class PreLiquibaseAutoConfiguration {
             super(ConfigurationPhase.REGISTER_BEAN);
         }
 
-        
         @ConditionalOnProperty(prefix = "preliquibase", name = "enabled", matchIfMissing = true)
         private static final class preLiquibaseEnabledCondition {
         }
@@ -179,15 +168,12 @@ public class PreLiquibaseAutoConfiguration {
         private static final class liquibaseEnabledCondition {
         }
     }
-    
-    
-    
-    
-    
+
     /**
-     * DataSource provider which resolves to the same DataSource as used by Liquibase
-     * execution. This is determined by using Spring Boot's own classes.
-     * 
+     * DataSource provider which resolves to the same DataSource as used by
+     * Liquibase execution. This is determined by using Spring Boot's own
+     * classes.
+     *
      * <p>
      * Note: The exact methodology which Spring Boot uses to determine which
      * DataSource to use for Liquibase is not to be documented here as it may
@@ -195,40 +181,44 @@ public class PreLiquibaseAutoConfiguration {
      * Spring Boot can determine this.
      */
     static class DefaultPreLiquibaseDataSourceProvider implements PreLiquibaseDataSourceProvider {
+
         private final DataSource dataSourceToUse;
 
         /**
-         * Determine DataSource (based on input) which Liquibase itself is using.
-         * 
-         * @param liquibaseProperties Spring Boot properties for Liquibase ("spring.liquibase")
-         * @param dataSourceProperties Spring Boot properties for DataSource ("spring.datasource")
+         * Determine DataSource (based on input) which Liquibase itself is
+         * using.
+         *
+         * @param liquibaseProperties Spring Boot properties for Liquibase
+         * ("spring.liquibase")
+         * @param dataSourceProperties Spring Boot properties for DataSource
+         * ("spring.datasource")
          * @param dataSource general DataSource (if any)
-         * @param liquibaseDataSource designated DataSource for Liquibase (if any).
-         *      This is typically a DataSource which has been annotated with {@code @LiquibaseDataSource}
-         *      in order to mark it as designated for Liquibase. If this DataSource exists
-         *      it will be used in preference to a DataSource in {@code dataSource} parameter.
+         * @param liquibaseDataSource designated DataSource for Liquibase (if
+         * any). This is typically a DataSource which has been annotated with
+         * {@code @LiquibaseDataSource} in order to mark it as designated for
+         * Liquibase. If this DataSource exists it will be used in preference to
+         * a DataSource in {@code dataSource} parameter.
          */
         public DefaultPreLiquibaseDataSourceProvider(
                 @NonNull LiquibaseProperties liquibaseProperties,
-                @NonNull DataSourceProperties dataSourceProperties, 
-                @NonNull ObjectProvider<DataSource> dataSource, 
+                @NonNull DataSourceProperties dataSourceProperties,
+                @NonNull ObjectProvider<DataSource> dataSource,
                 @NonNull ObjectProvider<DataSource> liquibaseDataSource) {
-            
+
             // Here we re-use Spring Boot's own LiquibaseAutoConfiguration
             // so that we figure out which DataSource will (later) be used
             // by LiquibaseAutoConfiguration. This ensures that we use the same
             // logic for figuring out which DataSource to use.
-            
             // Note that SpringLiquibase object below gets instantiated OUTSIDE
             // of the IoC container, meaning it is just normal "new" instantiaion.
             // This is important as we do not want the SpringLiquibase's 
             // afterPropertiesSet method to kick in. All we are interested in 
             // is to figure out which datasource Liquibase would be using.
-            LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration = 
-                    new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
+            LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration
+                    = new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
             SpringLiquibase liquibase = liquibaseConfiguration.liquibase(
                     dataSource, liquibaseDataSource);
-            
+
             // Sanity check
             Objects.requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");
             this.dataSourceToUse = liquibase.getDataSource();
@@ -239,7 +229,4 @@ public class PreLiquibaseAutoConfiguration {
             return dataSourceToUse;
         }
     }
-    
-
-    
 }

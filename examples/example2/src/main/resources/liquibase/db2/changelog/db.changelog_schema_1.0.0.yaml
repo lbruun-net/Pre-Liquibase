@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0
+      author: lbruun
+      changes:
+        #
+        # ----------------------------------
+        # APP_EVENTS table
+        # ----------------------------------
+        - createTable:
+            tableName: APP_EVENTS
+            columns:
+              - column:
+                  name: APP_EVENT_ID
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: EVENT_TIME_UTC
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: EVENT_TYPE
+                  type: VARCHAR(5)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: EVENT_TEXT
+                  type: VARCHAR(1000)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: APP_EVENTS
+            columnNames: APP_EVENT_ID            
+            constraintName: PK_APP_EVENTS
+        #
+        # ----------------------------------
+        # LAST_LOGINS table
+        # ----------------------------------
+        - createTable:
+            tableName: LAST_LOGINS
+            columns:
+              - column:
+                  name: LAST_LOGIN_USERNAME
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: IP_ADDRESS
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: EVENT_TIME_UTC
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: LAST_LOGINS
+            columnNames: LAST_LOGIN_USERNAME
+            constraintName: PK_LAST_LOGINS
