@@ -38,7 +38,7 @@ If not, you should pause and ask yourself if you are doing the right thing.
 The module requires 
 
 - Java 8 or later 
-- Spring Boot 2.5 or later (see <<Spring Boot compatibility>>)
+- Spring Boot 2.6 or later (see <<Spring Boot compatibility>>)
 
 {nbsp} +
 {nbsp} +
@@ -350,9 +350,37 @@ easily adapt to a single datasource use-case.
 
 == Spring Boot compatibility
 
-Pre-Liquibase works with Spring Boot 2.5+ and has currently been tested with `2.5`, `2.6` and `2.7`. There's no reason why it 
+Current version works with Spring Boot 2.6+ and has been tested with `2.6` and `2.7`. There's no reason why it
 should not work with any future 2.x release of Spring Boot.
 
+
+
+[cols=4*,options=header]
+|===
+|Pre-Liquibase version
+|Spring Boot compatibility
+|Git branch name
+|Description
+
+|1.2.x 
+|Spring Boot 2.6 and later
+|`master`
+|Use this unless you absolutely *must* use an older version of Spring Boot.
+
+|1.1.x and later
+|Spring Boot 2.5
+|
+|No longer maintained
+
+|1.0.x
+|Spring Boot 2.3, Spring Boot 2.4
+|`prior-to-spring-boot-2.5`
+|No longer maintained.
+
+
+|===
+
+In summary:  Version 1.1.x or later is the recommended version of Pre-Liquibase but it requires Spring Boot 2.5 or later.
 
 
 == Alternatives
