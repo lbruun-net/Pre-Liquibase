@@ -237,11 +237,9 @@ Setting this property will override auto-detection of the database platform bein
 
 |sqlScriptReferences
 |CSV 
-|null
+|`classpath:/preliquibase/`
 |Comma-separated list of Spring Resource locations for where to find the SQL scripts 
 which the module will execute. See <<sql_scripts_lookup>> for more information.
-
-Default value: `classpath:/preliquibase/`
 
 |continueOnError
 |boolean 
