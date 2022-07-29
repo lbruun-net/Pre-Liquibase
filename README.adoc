@@ -91,7 +91,7 @@ spring.liquibase.default-schema=${my.db.schemaname}
 ----
 
 Now - in this example - the only thing left to decide is where the `my.db.schemaname` value
-comes from. That is your choice. The link:example/[example project] advocates
+comes from. That is your choice. The link:examples/example1/[example project] advocates
 that it should come from an OS environment variable, in particular if your are
 deploying to a cloud.
 
@@ -114,7 +114,7 @@ database will be auto-detected so that the right SQL script is executed.
 SQL script files can contain replacement variables on the form `${propertyName}` or `${propertyName:defaultValue}` so
 as to make your SQL script file dynamic. The property will be resolved from your application's Spring Environment.
 
-You can find an example project link:example1/[here].
+You can find an example project link:examples/example1/[here].
 
 
 === Maven dependency
@@ -267,8 +267,8 @@ You should work on that first and only use this setting as a last resort.
 
 === Examples
 
-- link:example1/[Example 1]. Using Pre-Liquibase with a single datasource.
-- link:example2/[Example 2]. Using Pre-Liquibase with multiple datasources. This requires configuring
+- link:examples/example1/[Example 1]. Using Pre-Liquibase with a single datasource.
+- link:examples/example2/[Example 2]. Using Pre-Liquibase with multiple datasources. This requires configuring
   beans yourself, not just for Pre-Liquibase but also for Liquibase, JPA/Hibernate and so on. The
   example application shows how to do this. (in many ways it is a show-case application for how to
   to use multiple datasources in general in a Spring Boot application; the Pre-Liquibase part of it is trivial)
@@ -326,7 +326,7 @@ will work with any database platform.
 You can use Spring Boot's `@DataJpaTest` annotation as you normally would because the Pre-Liquibase module 
 registers itself as one of the auto-configs which are in-scope when this annotation is applied to a test class.
 
-The link:example/[example project] showcases this.
+The link:examples/example1/[example project] showcases this.
 
 
 === Troubleshooting
