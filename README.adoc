@@ -344,7 +344,9 @@ logging.level.liquibase=TRACE
 
 Pre-Liquibase assumes that you are using auto-configuration for Liquibase as well. If you are manually
 configuring a bean of type `SpringLiquibase` then Pre-Liquibase will not fire. You can find the background
-for this explained in https://github.com/lbruun/Pre-Liquibase/issues/5[Issue #5].
+for this explained in https://github.com/lbruun/Pre-Liquibase/issues/5[Issue #5]. In such case you'll have
+to do configure all beans yourself. You can find an example of this in link:example2/[Example 2] which you can
+easily adapt to a single datasource use-case.
 
 == Spring Boot compatibility
 
