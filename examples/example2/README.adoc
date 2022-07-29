@@ -1,0 +1,162 @@
+= Pre-Liquibase example application
+:source-linenums-option:
+:toc:
+:toc-placement!:
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+Example application **Medusa** showcases how the Pre-Liquibase module
+might be used for a Spring Boot based application which uses *multiple data sources*.
+
+Like Example 1, the aim of Pre-Liquibase in this application is to ensure that a database "home" 
+(a schema) exists for the currrent instance of the application. This way multiple 
+instances of the application can all use the same database server and the same database 
+identity, yet inside the database server the various instances are duly separated by schema.
+
+Since the application uses multiple datasources it cannot use auto-configuration
+in the traditional sense (see Example1). Therefore, most beans must be configured manually.
+
+This example application uses
+
+- Spring Boot 2
+- Spring Data JPA (Hibernate) - with multiple data sources
+- Liquibase
+
+
+With the example we've achieved:
+
+- We are using Pre-Liquibase and Liquibase with multiple data sources.
+- The Pre-Liquibase module ensures that the schemas where tables
+  live (including the two Liquibase metadata tables) actually exists prior to 
+  executing Liquibase itself.
+- Like in Example 1, the schema names are dynamic. Schema takes its name partly from an
+  OS environment variable, `MEDUSA_ENVNAME`, so that different instances
+  of the Medusa application can use the same database user, albeit they
+  will be separated by schema name. This way, when a new instance (a new environment)
+  of the Medusa application is created, say 'uat3', the schemas
+  will be auto-created with a name of 'medusa_uat3_xxx' (where 'xxx' corresponds to a
+  descriptive name of our datasource). All we have to 
+  do is to make sure that different Medusa environments have different value
+  in the OS environment variable `MEDUSA_ENVNAME`. Such way of working fits nicely
+  with the cloud world: different instances of our application (of the same version) deployed 
+  as different environment should _not_ differ in what gets deployed. They should
+  only differ in their environment. The alternative is that our source code repo will
+  have environment specific information in it. That is rarely a good idea.
+ 
+ 
+=== Beans configuration
+
+Since we are using multiple data sources in the application we cannot rely on Spring Boot's
+auto-configuration. Instead this must be done manually. 
+
+All beans wiring take place in `MedusaApplicationConfig` class. The configuration to a great
+extend mimics what Spring Boot would be doing automatically had we only had one data source.
+
+The important things to note are:
+
+- PreLiquibase bean must be configured as shown in the config class. Do not forget the `execute()`.
+- There is a certain order in which things need to happen. This is achieved by Spring's `@DependsOn`
+  annotation. The order is:
+  . Creation of DataSource
+  . Pre-Liquibase execution
+  . Liquibase execution
+  . Creation of JPA stuff
+
+The beans configuration is created such that all configuration properties are available 
+under the `persistence.` namespace with the following sub-namespaces:
+
+- `persistence.datasource.dbX.`. DataSource configuration properties, such as `url`, `username`
+  and `password`. If these are not specified then Spring Boot will use an embedded H2 database.
+- `persistence.datasource.poolconfig.dbX.`. JDBC Connection Pool properties. These are forwarded
+  as-is to whatever connection pool implementation is in use, e.g. Hikari.
+- `persistence.preliquibase.dbX.`. Pre-Liquibase properties. In an multi-datasource application
+  it will likely be required to set `sqlScriptReferences`.
+- `persistence.liquibase.dbX.`. Liquibase properties. 
+- `persistence.jpa.dbX.`. Spring JPA properties. You can use all the standard ones plus
+  in addition `persistenceUnitName` for giving the JPA Persistence Unit bean a custom name.
+- `persistence.jpa.dbX.properties.`. JPA Provider properties. These are forwarded as-is
+  to whatever JAP Provider is in use, e.g. Hibernate.   
+
+
+ 
+=== Running the application
+ 
+When the application is executed you should see the following log output: +
+(for this execution the content of the OS environment variable MEDUSA_ENVNAME was `uat9` and log level was `INFO`)
+
+ 
+[source,text]
+----
+(001) n.l.s.p.example.MedusaApplication        : Starting MedusaApplication using Java 11.0.14 on ....
+(002) n.l.s.p.example.MedusaApplication        : No active profile set, falling back to default profiles: default
+(003) .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+(004) .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 33 ms. Found 1 JPA repository interfaces.
+(005) .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+(006) .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 2 JPA repository interfaces.
+(007) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-app - Starting...
+(008) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-app - Start completed.
+(009) n.l.s.preliquibase.PreLiquibase          : PreLiquibase: Executing SQL script : class path resource [preliquibase/db1/h2.sql]
+(010) liquibase.lockservice                    : Successfully acquired change log lock
+(011) liquibase.changelog                      : Creating database history table with name: medusa_uat9_app.LIQUIBASE_DBCHANGELOG
+(012) liquibase.changelog                      : Reading from medusa_uat9_app.LIQUIBASE_DBCHANGELOG
+(013) liquibase.changelog                      : Table PERSONS created
+(014) liquibase.changelog                      : Primary key added to PERSONS (PERSON_ID)
+(015) liquibase.changelog                      : ChangeSet /liquibase/db1/changelog/db.changelog_schema_1.0.0.yaml::1.0.0::lbruun ran successfully in 16ms
+(016) liquibase.lockservice                    : Successfully released change log lock
+(017) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-log - Starting...
+(018) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-log - Start completed.
+(019) n.l.s.preliquibase.PreLiquibase          : PreLiquibase: Executing SQL script : class path resource [preliquibase/db2/h2.sql]
+(020) liquibase.lockservice                    : Successfully acquired change log lock
+(021) liquibase.changelog                      : Creating database history table with name: medusa_uat9_log.LIQUIBASE_DBCHANGELOG
+(022) liquibase.changelog                      : Reading from medusa_uat9_log.LIQUIBASE_DBCHANGELOG
+(023) liquibase.changelog                      : Table APP_EVENTS created
+(024) liquibase.changelog                      : Primary key added to APP_EVENTS (APP_EVENT_ID)
+(025) liquibase.changelog                      : Table LAST_LOGINS created
+(026) liquibase.changelog                      : Primary key added to LAST_LOGINS (LAST_LOGIN_USERNAME)
+(027) liquibase.changelog                      : ChangeSet /liquibase/db2/changelog/db.changelog_schema_1.0.0.yaml::1.0.0::lbruun ran successfully in 16ms
+(028) liquibase.lockservice                    : Successfully released change log lock
+(029) o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: app]
+(030) org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.4.Final
+(031) o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+(032) org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+(033) o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+(034) j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'app'
+(035) o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: log]
+(036) org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+(037) o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+(038) j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'log'
+(039) n.l.s.p.example.MedusaApplication        : Medusa environment name: uat9
+(040) n.l.s.p.example.MedusaApplication        : Started MedusaApplication in 4.383 seconds (JVM running for 4.792)
+  example output removed
+(041) j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'log'
+(042) j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'app'
+(043) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-log - Shutdown initiated...
+(044) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-log - Shutdown completed.
+(045) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-app - Shutdown initiated...
+(046) com.zaxxer.hikari.HikariDataSource       : JDBCConnectionPool-app - Shutdown completed.
+----
+
+Line 7-8 is Hikari startup for 'db1' (display name 'app') +
+Line 9 is Pre-Liquibase execution for 'db1' +
+Line 10-16 is Liquibase exectionn for 'db1' +
+Line 17-18 is Hikari startup for 'db2' (display name 'log') +
+Line 19 is Pre-Liquibase execution for 'db2' +
+Line 20-28 is Liquibase exectionn for 'db2' +
+Line 29-34 is Spring JPA / Hibernate initialization for 'db1' (display name 'app') +
+Line 35-38 is Spring JPA / Hibernate initialization for 'db2' (display name 'log') +
+Line 41 is Spring JPA closedown for 'db1' (display name 'app') +
+Line 42 is Spring JPA closedown for 'db2' (display name 'log') +
+Line 43-44 is Hikari closedown for 'db1' (display name 'app') +
+Line 45-46 is Hikari closedown for 'db2' (display name 'log') +
+
+
+
+
+
+
+

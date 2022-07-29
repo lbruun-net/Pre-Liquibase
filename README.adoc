@@ -114,7 +114,7 @@ database will be auto-detected so that the right SQL script is executed.
 SQL script files can contain replacement variables on the form `${propertyName}` or `${propertyName:defaultValue}` so
 as to make your SQL script file dynamic. The property will be resolved from your application's Spring Environment.
 
-You can find an example project link:example/[here].
+You can find an example project link:example1/[here].
 
 
 === Maven dependency
@@ -154,7 +154,7 @@ Rules for the file are:
 
 
 
-=== How the module locates SQL script files
+=== How the module locates SQL script files [[sql_scripts_lookup]]
 
 Pre-Liquibase locates the SQL script(s) to execute based on the value of the `sqlScriptReferences` 
 configuration property. The default for this property is `classpath:/preliquibase/`.
@@ -238,12 +238,10 @@ Setting this property will override auto-detection of the database platform bein
 |sqlScriptReferences
 |CSV 
 |null
-|Comma-separated list of Spring Resource locations for where to alternatively find the SQL scripts (including the filename itself).
-The value must be a comma-separated list of Spring Resource references, for example `file:/foo/bar/myscript1.sql,file:/foo/bar/myscript2.sql`.
-The resource must exist, otherwise an `InvalidConfigurationPropertyValueException` exception is thrown. All scripts in the list
-will be executed.
+|Comma-separated list of Spring Resource locations for where to find the SQL scripts 
+which the module will execute. See <<sql_scripts_lookup>> for more information.
 
-Setting this property is an alternative to the default: loading scripts from `classpath:/preliquibase/` location. 
+Default value: `classpath:/preliquibase/`
 
 |continueOnError
 |boolean 
@@ -269,13 +267,27 @@ You should work on that first and only use this setting as a last resort.
 
 |===
 
+=== Examples
+
+- link:example1/[Example 1]. Using Pre-Liquibase with a single datasource.
+- link:example2/[Example 2]. Using Pre-Liquibase with multiple datasources. This requires configuring
+  beans yourself, not just for Pre-Liquibase but also for Liquibase, JPA/Hibernate and so on. The
+  example application shows how to do this. (in many ways it is a show-case application for how to
+  to use multiple datasources in general in a Spring Boot application; the Pre-Liquibase part of it is trivial)
+
 
 == Additional notes
 
 === Which DataSource is used?
 
 The module will use the same DataSource as Spring Boot Liquibase module does. This seams
-reasonable and there are currently no plans to change it or to allow flexibility in this respect.
+reasonable for an application with a single data source defined and there are currently no
+plans to change it or to allow flexibility in this respect.
+
+For an application with multiple data sources you'll need to configure PreLiquibase beans
+yourself. Configuring the beans yourself allows unlimited flexibility. An example of this
+can be found in link:example2/[Example 2].
+
 
 === To quote or not to quote?
 You need to consider case (upper/lower) for the schema name. The SQL standard mandates that object names
