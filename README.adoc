@@ -367,7 +367,7 @@ should not work with any future 2.x release of Spring Boot.
 |`master`
 |Use this unless you absolutely *must* use an older version of Spring Boot.
 
-|1.1.x and later
+|1.1.x
 |Spring Boot 2.5
 |
 |No longer maintained
