@@ -61,9 +61,10 @@ import org.springframework.util.StreamUtils;
  * 
  * <p>
  * Prior to execution the SQL scripts are 'filtered through the environment'. 
- * This means that placeholders in the SQL scripts on the form {@code $[propertname}}
- * or {@code $[propertname:defaultvalue}} are replaced with the appropriate
- * value from the Spring {@code Environment}.
+ * This means that placeholders in the SQL scripts on the form {@code ${propertname}}
+ * or {@code ${propertname:defaultvalue}} are replaced with the appropriate
+ * value from the
+ * <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/env/Environment.html">Spring Environment</a>.
  *
  * @author lbruun
  */
