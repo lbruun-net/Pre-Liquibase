@@ -55,25 +55,9 @@ import org.springframework.util.StreamUtils;
  * as a side-car to Liquibase.
  * 
  * <p>
- * The SQL scripts are located from one of the locations below (in order):
- * <ol>
- *   <li>If present, by the location(s) specified in {@link PreLiquibaseProperties#getSqlScriptReferences()}. 
- *       If any resource specified herein does not exist it will result in RuntimeException.</li>
- *   <li>From classpath location (in order, only one of these will be executed).
- * 
- *      <ol>
- *          <li>File named {@code preliquibase/DBPLATFORMCODE.sql}, for example 
- *          {@code preliquibase/mysql.sql}. By default the {@code DBPLATFORMCODE} value
- *          will be auto-detected from the {@code dataSource} using Liquibase 
- *          library and will be a Liquibase database short name
- *          (the same codes which can use used in a Liquibase {@code dbms} 
- *          pre-condition in a Liquibase ChangeSet).
- *          However the {@code DBPLATFORMCODE} can optionally be overridden with the the 
- *          {@link PreLiquibaseProperties#getDbPlatformCode() dbPlatformCode property}
- *          in which case it can be any string value.</li>
- *          <li>File named {@code preliquibase/default.sql}</li>
- *      </ol></li>
- * </ol>
+ * The SQL scripts to be executed are specified via the
+ * {@link PreLiquibaseProperties#setSqlScriptReferences(java.util.List) sqlScriptReferences}
+ * configuration property.
  * 
  * <p>
  * Prior to execution the SQL scripts are 'filtered through the environment'. 
