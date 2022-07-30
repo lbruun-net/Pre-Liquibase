@@ -139,7 +139,7 @@ Rules for the file are:
 
 - The syntax used must be native to your target database platform. You cannot use constructs from higher-level
   tools such as SQL*Plus (Oracle), `psql` (PostgreSQL) or `sqlcmd` (MS SQL Server).
-- Statements ends with a semi-colon character.
+- Statements ends with a semi-colon character. (by default, can be <<Configuration,customized>>)
 - Comment lines start with `--`.
 - Replacement variables on the form `${propertyName}` or `${propertyName:defaultValue}` can appear
   anywhere in the file so as to make your SQL script file dynamic. The property will be resolved from 
