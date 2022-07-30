@@ -25,7 +25,7 @@ limitations under the License.
     </parent>
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-example-1</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
     <name>Spring Boot AutoConfiguration :: Pre-Liquibase Example 1</name>
 
@@ -48,7 +48,7 @@ limitations under the License.
         <dependency>
             <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-starter</artifactId>
-            <version>1.2.1-SNAPSHOT</version> <!-- in a real life application you would not use a SNAPSHOT version here -->
+            <version>1.2.1</version> <!-- in a real life application you would not use a SNAPSHOT version here -->
         </dependency>
 
         <!-- JDBC drivers - a real life application would probably have
@@ -105,4 +105,8 @@ limitations under the License.
 
         </plugins>
     </build>
+
+  <scm>
+    <tag>1.2.1</tag>
+  </scm>
 </project>
