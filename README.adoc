@@ -147,7 +147,7 @@ Rules for the file are:
 - The script should be idempotent code (only-create-if-not-already-exists statements), execute quickly 
   and generally be without side effects. Remember that the SQL script will be executed _every_ time 
   your application starts. Also, unlike Liquibase itself, Pre-Liquibase does not have a mechanism
-  to ensure that the script only executes on only one node, if your application is multi-node. To mitigate
+  to ensure that the script only executes on only one node if your application is multi-node. To mitigate
   this the script should ideally be one atomic unit which the database engine can execute. Yet
   another reason why you would probably want to have only a single SQL statement in your script.
 - Don't bother putting SELECT statements in the script. The result will not be shown anywhere.
