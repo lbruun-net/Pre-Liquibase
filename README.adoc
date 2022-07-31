@@ -279,29 +279,33 @@ You should work on that first and only use this setting as a last resort.
 === Which DataSource is used?
 
 The module will use the same DataSource as Spring Boot Liquibase module does. This seams
-reasonable for an application with a single data source defined and there are currently no
-plans to change it or to allow flexibility in this respect.
+reasonable for an application with a single data source defined. However, it is possible to override this
+by registering your own bean of type `PreLiquibaseDataSourceProvider` while still using auto-configuration
+for everything else.
 
-For an application with multiple data sources you'll need to configure PreLiquibase beans
-yourself. Configuring the beans yourself allows unlimited flexibility. An example of this
-can be found in link:example2/[Example 2].
+The other option is to configure the `PreLiquibase` bean(s) yourself in which case there's no need for
+`PreLiquibaseDataSourceProvider`. Configuring `PreLiquibase` beans yourself will indeed be needed if the
+application uses multiple data sources. Configuring the beans yourself allows unlimited flexibility.
+However, it typically means you'll have to configure _all_ beans related to persistence
+(Pre-Liquibase, Liquibase, JPA, JTA, etc) yourself as auto-configuration will back off.
+An example of this can be found in link:example2/[Example 2].
 
 
 === To quote or not to quote?
 You need to consider case (upper/lower) for the schema name. The SQL standard mandates that object names
 are treated case-insentive if the value is not quoted.
 
-However, there's a quirk in Liquibase. While Liquibase in general offers offers control over SQL object 
-quoting behavior (by way of the `objectQuotingStrategy` 
-attribute in your changelog) the same is not true in respect to Liquibase system tables, i.e. DATACHANGELOG and 
-DATABASECHANGELOGLOCK. Here Liquibase will always use the strategy named `LEGACY`. This means that SQL objects will 
-be quoted if they are of mixed case, otherwise not. This may create unexpected results with regards to the name
-of the schema holding the the Liquibase system tables. Therefore, the advice is to *_use either all lower-case or 
-all upper-case for schema name, never mixed case_*. In short 'Foo_bar' is not a good value, but 'FOO_BAR' or 'foo_bar' is.
+However, there's a quirk in Liquibase. While Liquibase in general offers offers control over SQL object
+quoting behavior (by way of the `objectQuotingStrategy` attribute in your changelog) the same is not true
+in respect to Liquibase system tables, i.e. DATACHANGELOG and DATABASECHANGELOGLOCK. Here Liquibase will always
+use the strategy named `LEGACY`. This means that SQL objects will be quoted if they are of mixed case, otherwise not.
+This may create unexpected results with regards to the name of the schema holding the the Liquibase system tables.
+Therefore, the advice is to *_use either all lower-case or all upper-case for schema name, never mixed case_*.
+In short 'Foo_bar' is not a good value, but 'FOO_BAR' or 'foo_bar' is.
 
 An example: 
 
-Let's say you are asking Pre-Liquibase to execute a SQL script for PostgresSQL like this
+Let's say you are asking Pre-Liquibase to execute a SQL script for PostgreSQL like this
 
 [source,text]
 ----
@@ -315,7 +319,7 @@ and you are then telling Liquibase to use the exact same value:
 spring.liquibase.default-schema=${my.db.schemaname}
 ----
 
-All is good?  No, not so, if the value for `${my.db.schemaname}` is of mixed case, let's say `Foo_bar`.
+All is good?  No, not so, if the value for `${my.db.schemaname}` is of mixed case, let's say `Foo_bar`,
 Liquibase will attempt to create its system tables in a schema named `"Foo_bar"` (quoted) but the Pre-Liquibase
 SQL script will have created a schema in the database server with name `foo_bar` so you'll get an 
 error on Liquibase execution. Hence the recommendation to not use mixed-case for the schema name. Such strategy
