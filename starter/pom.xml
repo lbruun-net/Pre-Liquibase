@@ -20,7 +20,7 @@ limitations under the License.
     <parent>
         <groupId>net.lbruun.springboot</groupId>
         <artifactId>preliquibase-spring-boot-parent</artifactId>
-        <version>1.2.2-SNAPSHOT</version>
+        <version>1.2.2</version>
     </parent>
 
     <artifactId>preliquibase-spring-boot-starter</artifactId>
