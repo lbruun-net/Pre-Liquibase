@@ -68,9 +68,10 @@ public class PreLiquibaseAutoConfiguration {
      * Returns provider which will tell which {@code DataSource} to use for
      * Pre-Liquibase. This will return a provider which will resolve to the same
      * DataSource as used by Liquibase itself, however an application can
-     * register its own bean of type {@code PreLiquibaseDataSourceProvider} and
+     * configure its own bean of type {@code PreLiquibaseDataSourceProvider} and
      * thereby override which DataSource to use for Pre-Liquibase.
      */
+    @ConditionalOnMissingBean({PreLiquibaseDataSourceProvider.class})
     @Bean
     public PreLiquibaseDataSourceProvider preLiquibaseDataSourceProvider(
             LiquibaseProperties liquibaseProperties,
