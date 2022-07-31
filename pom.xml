@@ -18,7 +18,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-parent</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>autoconfigure</module>
@@ -59,7 +59,7 @@ limitations under the License.
         <connection>scm:git:https://github.com/lbruun/Pre-Liquibase.git</connection>
         <developerConnection>scm:git:https://github.com/lbruun/Pre-Liquibase.git</developerConnection>
         <url>https://github.com/lbruun/Pre-Liquibase</url>
-      <tag>1.2.2</tag>
+      <tag>HEAD</tag>
   </scm>    
 
  
