@@ -20,20 +20,13 @@ limitations under the License.
     <parent>
         <groupId>net.lbruun.springboot</groupId>
         <artifactId>preliquibase-spring-boot-parent</artifactId>
-<<<<<<< Upstream, based on master
         <version>1.2.3-SNAPSHOT</version>
-=======
-        <version>1.1.2-SNAPSHOT</version>
->>>>>>> a7dced2 Bump Spring Boot => 2.7.0
-    </parent>
+	</parent>
 
     <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
     <packaging>jar</packaging>
     <name>Spring Boot AutoConfiguration :: Pre-Liquibase AutoConfiguration</name>
-<<<<<<< Upstream, based on master
-=======
 
->>>>>>> a7dced2 Bump Spring Boot => 2.7.0
     <description>Autoconfiguration for Pre-Liquibase</description>
 
     <dependencies>
@@ -63,18 +56,12 @@ limitations under the License.
             <artifactId>hsqldb</artifactId>
             <scope>test</scope>
         </dependency>
-<<<<<<< Upstream, based on master
-=======
 
->>>>>>> a7dced2 Bump Spring Boot => 2.7.0
     </dependencies>
 
     <build>
         <plugins>
-<<<<<<< Upstream, based on master
-=======
 
->>>>>>> a7dced2 Bump Spring Boot => 2.7.0
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version> <!-- Must be at least 2.22 for Junit 5 -->
