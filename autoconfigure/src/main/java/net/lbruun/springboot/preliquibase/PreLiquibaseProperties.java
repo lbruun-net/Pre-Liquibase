@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@ import static net.lbruun.springboot.preliquibase.PreLiquibaseProperties.PROPERTI
 @ConfigurationProperties(prefix = PROPERTIES_PREFIX)
 public class PreLiquibaseProperties {
 
-    public static final String PROPERTIES_PREFIX = "preliquibase";
+  public static final String PROPERTIES_PREFIX = "preliquibase";
     public static final String DEFAULT_SCRIPT_LOCATION
             = "classpath:preliquibase/";
 
@@ -50,18 +50,18 @@ public class PreLiquibaseProperties {
     /**
      * SQL script resource references.
      */
-    @NotEmpty(message = "sqlScriptReferences must not be empty")
+  @NotEmpty(message = "sql-script-references must not be empty")
     private List<String> sqlScriptReferences = Collections.singletonList(DEFAULT_SCRIPT_LOCATION);
 
-    /**
-     * Whether to stop if an error occurs while executing the SQL script.
-     */
-    private boolean continueOnError = false;
+  /**
+   * Whether to stop if an error occurs while executing the SQL script.
+   */
+  private boolean continueOnError = false;
 
-    /**
-     * Statement separator in SQL initialization scripts.
-     */
-    private String separator = ";";
+  /**
+   * Statement separator in SQL initialization scripts.
+   */
+  private String separator = ";";
 
     /**
      * SQL scripts encoding.
@@ -99,13 +99,40 @@ public class PreLiquibaseProperties {
     }
 
 
-    /**
+  /**
+   * Get the 'enabled' setting (if the module is enabled or not).
+   * @see #setEnabled(boolean)
+   * @return
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  /**
+   * Disables or enables module. Default is {@code true} (module is enabled).
+   * @param enabled
+   */
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+
+  /**
+   * Gets 'continueOnError' setting.
+   * @see #setContinueOnError(boolean)
+   */
+  public boolean isContinueOnError() {
+    return continueOnError;
+  }
+
+
+  /**
      * Sets whether to stop if an error occurs while executing the SQL script.
      * Default value is: {@code false}.
-     */
-    public void setContinueOnError(boolean continueOnError) {
-        this.continueOnError = continueOnError;
-    }
+   */
+  public void setContinueOnError(boolean continueOnError) {
+    this.continueOnError = continueOnError;
+  }
 
 
     /**
@@ -120,10 +147,10 @@ public class PreLiquibaseProperties {
     /**
      * Sets statement separator in SQL scripts.
      * Defaults to semi-colon if not set.
-     */
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
+   */
+  public void setSeparator(String separator) {
+    this.separator = separator;
+  }
 
     /**
      * Gets 'sqlScriptEncoding'.
@@ -135,7 +162,7 @@ public class PreLiquibaseProperties {
         return this.sqlScriptEncoding;
     }
 
-    /**
+  /**
      * Sets the file encoding for SQL script file.
      * Defaults to {@code UTF-8} if not set.
      *
@@ -188,7 +215,7 @@ public class PreLiquibaseProperties {
      * <p>
      * The value is interpreted slightly differently depending on its
      * content:
-     * <ul>
+   * <ul>
      *   <li>If the value is a Spring Resource textual reference which ends with {@code "/"}:
      *       In this case, the reference is expected to be a folder reference
      *       where SQL scripts can be found. From this folder:

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,12 @@
  */
 package net.lbruun.springboot.preliquibase;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -50,12 +56,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author lbruun
  */
 @ExtendWith(OutputCaptureExtension.class)
-public class PreLiquibaseAutoConfigurationTest {
+class PreLiquibaseAutoConfigurationTest {
 
+  private static final String JDBC_URL1 = "jdbc:hsqldb:mem:stdtest";
 
-    private static final String JDBC_URL1 = "jdbc:hsqldb:mem:stdtest";
+  @BeforeEach
+  void init(TestInfo testInfo) {
+    System.out.println("\n\nRunning test : " + testInfo.getDisplayName());
+  }
+
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(
+      .withConfiguration(
+          AutoConfigurations.of(
                     PreLiquibaseAutoConfiguration.class,
                     LiquibaseAutoConfiguration.class))
             .withPropertyValues("spring.datasource.generate-unique-name=true");
@@ -107,14 +119,32 @@ public class PreLiquibaseAutoConfigurationTest {
                 .run((context) -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
     }
 
-    @Test
-    void backsOffIfNotEnabledLiquibase() {
-        this.contextRunner
-                .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-                .withPropertyValues(
-                        "spring.liquibase.enabled=false",
-                        "spring.datasource.url=" + JDBC_URL1)
-                .run((context) -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
+
+  @Test
+  void backsOffIfNotEnabledLiquibase() {
+    contextRunner
+        .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
+        .withPropertyValues(
+            "spring.liquibase.enabled=false",
+            "spring.datasource.url=" + JDBC_URL1)
+        .run(context -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
+  }
+
+  @Configuration(proxyBeanMethods = false)
+  @EnableConfigurationProperties({PreLiquibaseProperties.class})
+  static class PreLiquibaseUserConfiguration {
+
+    @Bean
+    public PreLiquibase customPreLiquibase(
+        Environment environment,
+        PreLiquibaseProperties properties,
+        ApplicationContext applicationContext) {
+
+      return new PreLiquibase(
+          environment,
+          DataSourceBuilder.create().url(JDBC_URL1).build(),
+          properties,
+          applicationContext);
     }
 
     @Test
@@ -149,7 +179,7 @@ public class PreLiquibaseAutoConfigurationTest {
                 .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
                 .withPropertyValues(
                         "spring.datasource.url=" + JDBC_URL1,
-                        "preliquibase.sqlScriptReferences=file:src/test/resources/preliquibase-customlocation/hsqldb.sql,file:src/test/resources/preliquibase-customlocation/default.sql",
+            "preliquibase.sql-script-references=file:src/test/resources/preliquibase-customlocation/hsqldb.sql,file:src/test/resources/preliquibase-customlocation/default.sql",
                         "sql.script.schemaname=myschema",
                         "spring.liquibase.default-schema=myschema")
                 .run(assertPreLiquibase((preLiquibase) -> {
