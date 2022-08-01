@@ -51,6 +51,7 @@ import liquibase.change.DatabaseChange;
 import liquibase.integration.spring.SpringLiquibase;
 import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.EnabledCondition;
 import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.LiquibaseDataSourceCondition;
+
 /**
  * Auto-configuration for Pre-Liquibase.
  *
