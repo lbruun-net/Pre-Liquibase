@@ -1,0 +1,2 @@
+# Add Pre-Liquibase class to list of Spring Boot's auto-configurations
+net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration
