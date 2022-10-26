@@ -11,6 +11,7 @@
 # for these file types.
 
 *.adoc             text eol=lf
+*.imports          text eol=lf
 *.java             text eol=lf
 *.md               text eol=lf
 *.properties       text eol=lf
