@@ -26,8 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AbstractDependsOnBeanFactoryPostProcessor;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -53,12 +52,10 @@ import org.springframework.lang.NonNull;
  *
  * @author lbruun
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = {DataSourceAutoConfiguration.class}, before = {LiquibaseAutoConfiguration.class})
 @ConditionalOnClass({SpringLiquibase.class, DatabaseChange.class})
 @Conditional({LiquibaseDataSourceCondition.class, EnabledCondition.class})
 @ConditionalOnMissingBean({SpringLiquibase.class, PreLiquibase.class})
-@AutoConfigureAfter({DataSourceAutoConfiguration.class})
-@AutoConfigureBefore({LiquibaseAutoConfiguration.class})
 @EnableConfigurationProperties({DataSourceProperties.class, LiquibaseProperties.class, PreLiquibaseProperties.class})
 public class PreLiquibaseAutoConfiguration {
 
