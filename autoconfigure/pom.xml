@@ -65,12 +65,13 @@ limitations under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.4.1</version>
+                <!--
                 <configuration>
                     <javaApiLinks>
                         <property>
-                            <name>api_1.8</name>
-                            <value>https://docs.oracle.com/javase/8/docs/api/</value>
+                            <name>api_17</name>
+                            <value>https://docs.oracle.com/javase/17/docs/api/</value>
                         </property>
                     </javaApiLinks>
                     <tags>
@@ -98,7 +99,7 @@ limitations under the License.
 			<tag><name>serialData</name></tag>
 			<tag><name>see</name></tag>
                     </tags>
-                </configuration>
+                </configuration> -->
             </plugin>
 
             <!-- Do deploy current project -->
