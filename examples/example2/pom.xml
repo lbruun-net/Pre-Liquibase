@@ -69,7 +69,7 @@ limitations under the License.
         <dependency>
             <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-starter</artifactId>
-            <version>1.2.3-SNAPSHOT</version> <!-- in a real life application you would not use a SNAPSHOT version here -->
+            <version>1.3.0-RC1-SNAPSHOT</version> <!-- in a real life application you would not use a SNAPSHOT version here -->
         </dependency>
 
         <!-- JDBC drivers - a real life application would probably have 
