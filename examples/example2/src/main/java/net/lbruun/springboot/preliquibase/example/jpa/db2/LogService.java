@@ -15,15 +15,15 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Logging of applications "events" for audit purpose.
- *
  */
 @Service
 public class LogService {

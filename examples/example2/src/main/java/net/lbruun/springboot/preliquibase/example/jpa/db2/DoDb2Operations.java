@@ -15,7 +15,6 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
-import java.time.Instant;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;

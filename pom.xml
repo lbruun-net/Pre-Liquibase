@@ -14,7 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" child.project.url.inherit.append.path="false">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         child.project.url.inherit.append.path="false">
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-parent</artifactId>
@@ -27,7 +29,7 @@ limitations under the License.
         <module>examples/example2</module>
     </modules>
     <name>Spring Boot AutoConfiguration :: Pre-Liquibase Parent</name>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
@@ -68,28 +70,29 @@ limitations under the License.
     <organization>
         <name>lbruun.net</name>
     </organization>
-    
-    <licenses>        
+
+    <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
             <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-    
-    <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
+
+    <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false"
+         child.scm.url.inherit.append.path="false">
         <connection>scm:git:https://github.com/lbruun/Pre-Liquibase.git</connection>
         <developerConnection>scm:git:https://github.com/lbruun/Pre-Liquibase.git</developerConnection>
         <url>https://github.com/lbruun/Pre-Liquibase</url>
-      <tag>HEAD</tag>
-  </scm>    
+        <tag>HEAD</tag>
+    </scm>
 
- 
+
     <distributionManagement>
         <repository>
             <id>ossrh-lbruun</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-    </distributionManagement>    
+    </distributionManagement>
 
 
     <developers>
@@ -114,9 +117,8 @@ limitations under the License.
     </dependencyManagement>
 
 
-
     <build>
-        
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -125,7 +127,7 @@ limitations under the License.
                 </plugin>
             </plugins>
         </pluginManagement>
-        
+
         <plugins>
             <!--   Required for publishing to Maven Central  -->
             <plugin>
@@ -145,7 +147,7 @@ limitations under the License.
                 <artifactId>flatten-maven-plugin</artifactId>
                 <version>1.2.5</version>
                 <configuration>
-                     <flattenMode>ossrh</flattenMode>
+                    <flattenMode>ossrh</flattenMode>
                 </configuration>
                 <executions>
                     <!-- enable flattening -->
@@ -166,7 +168,7 @@ limitations under the License.
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- Skip deploying 'parent' (current project) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -180,8 +182,8 @@ limitations under the License.
     </build>
 
 
-    <profiles>        
-        <profile> 
+    <profiles>
+        <profile>
             <id>release-to-central</id>
             <build>
                 <plugins>
@@ -210,7 +212,7 @@ limitations under the License.
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>                    
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>

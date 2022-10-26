@@ -15,11 +15,10 @@
  */
 package net.lbruun.springboot.preliquibase.example;
 
-import net.lbruun.springboot.preliquibase.example.jpa.JpaPropertiesEnchanced;
-import javax.sql.DataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import net.lbruun.springboot.preliquibase.PreLiquibase;
 import net.lbruun.springboot.preliquibase.PreLiquibaseProperties;
+import net.lbruun.springboot.preliquibase.example.jpa.JpaPropertiesEnchanced;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
@@ -39,6 +38,8 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableConfigurationProperties({MedusaProperties.class})
 public class MedusaApplicationConfig {
@@ -49,6 +50,49 @@ public class MedusaApplicationConfig {
      * 'db2')
      */
     public static class DatabaseConfiguration {
+
+        /**
+         * Creates a {@code SpringLiquibase} object based on a DataSource and
+         * LiquibaseProperties.
+         *
+         * <p>
+         * Adapted from
+         * https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/liquibase/LiquibaseAutoConfiguration.java
+         */
+        public static SpringLiquibase getSpringLiquibase(
+                DataSource dataSource,
+                LiquibaseProperties liquibaseProperties) {
+            SpringLiquibase liquibase = new SpringLiquibase();
+            liquibase.setDataSource(dataSource);
+            liquibase.setChangeLog(liquibaseProperties.getChangeLog());
+            liquibase.setClearCheckSums(liquibaseProperties.isClearChecksums());
+            liquibase.setContexts(liquibaseProperties.getContexts());
+            liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
+            liquibase.setLiquibaseSchema(liquibaseProperties.getLiquibaseSchema());
+            liquibase.setLiquibaseTablespace(liquibaseProperties.getLiquibaseTablespace());
+            liquibase.setDatabaseChangeLogTable(liquibaseProperties.getDatabaseChangeLogTable());
+            liquibase.setDatabaseChangeLogLockTable(liquibaseProperties.getDatabaseChangeLogLockTable());
+            liquibase.setDropFirst(liquibaseProperties.isDropFirst());
+            liquibase.setShouldRun(liquibaseProperties.isEnabled());
+            liquibase.setLabels(liquibaseProperties.getLabels());
+            liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
+            liquibase.setRollbackFile(liquibaseProperties.getRollbackFile());
+            liquibase.setTestRollbackOnUpdate(liquibaseProperties.isTestRollbackOnUpdate());
+            liquibase.setTag(liquibaseProperties.getTag());
+            return liquibase;  // Liquibase will fire as part of afterPropertiesSet() method on SpringLiquibase object
+        }
+
+        // Utility methods for Spring Boot JPA setup
+        private static EntityManagerFactoryBuilder createEntityManagerFactoryBuilder(JpaProperties jpaProperties) {
+            JpaVendorAdapter jpaVendorAdapter = createJpaVendorAdapter(jpaProperties);
+            return new EntityManagerFactoryBuilder(jpaVendorAdapter, jpaProperties.getProperties(), null);
+        }
+
+        private static JpaVendorAdapter createJpaVendorAdapter(JpaProperties jpaProperties) {
+            HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
+            hibernateJpaVendorAdapter.getJpaPropertyMap().putAll(jpaProperties.getProperties());
+            return hibernateJpaVendorAdapter;
+        }
 
         @Configuration(proxyBeanMethods = false)
         @EnableJpaRepositories(basePackageClasses = {net.lbruun.springboot.preliquibase.example.jpa.db1.Person.class},
@@ -214,49 +258,6 @@ public class MedusaApplicationConfig {
                     final @Qualifier("db2EntityManagerFactory") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
                 return new JpaTransactionManager(entityManagerFactory.getObject());
             }
-        }
-
-        /**
-         * Creates a {@code SpringLiquibase} object based on a DataSource and
-         * LiquibaseProperties.
-         *
-         * <p>
-         * Adapted from
-         * https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/liquibase/LiquibaseAutoConfiguration.java
-         */
-        public static SpringLiquibase getSpringLiquibase(
-                DataSource dataSource,
-                LiquibaseProperties liquibaseProperties) {
-            SpringLiquibase liquibase = new SpringLiquibase();
-            liquibase.setDataSource(dataSource);
-            liquibase.setChangeLog(liquibaseProperties.getChangeLog());
-            liquibase.setClearCheckSums(liquibaseProperties.isClearChecksums());
-            liquibase.setContexts(liquibaseProperties.getContexts());
-            liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
-            liquibase.setLiquibaseSchema(liquibaseProperties.getLiquibaseSchema());
-            liquibase.setLiquibaseTablespace(liquibaseProperties.getLiquibaseTablespace());
-            liquibase.setDatabaseChangeLogTable(liquibaseProperties.getDatabaseChangeLogTable());
-            liquibase.setDatabaseChangeLogLockTable(liquibaseProperties.getDatabaseChangeLogLockTable());
-            liquibase.setDropFirst(liquibaseProperties.isDropFirst());
-            liquibase.setShouldRun(liquibaseProperties.isEnabled());
-            liquibase.setLabels(liquibaseProperties.getLabels());
-            liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
-            liquibase.setRollbackFile(liquibaseProperties.getRollbackFile());
-            liquibase.setTestRollbackOnUpdate(liquibaseProperties.isTestRollbackOnUpdate());
-            liquibase.setTag(liquibaseProperties.getTag());
-            return liquibase;  // Liquibase will fire as part of afterPropertiesSet() method on SpringLiquibase object
-        }
-
-        // Utility methods for Spring Boot JPA setup
-        private static EntityManagerFactoryBuilder createEntityManagerFactoryBuilder(JpaProperties jpaProperties) {
-            JpaVendorAdapter jpaVendorAdapter = createJpaVendorAdapter(jpaProperties);
-            return new EntityManagerFactoryBuilder(jpaVendorAdapter, jpaProperties.getProperties(), null);
-        }
-
-        private static JpaVendorAdapter createJpaVendorAdapter(JpaProperties jpaProperties) {
-            HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
-            hibernateJpaVendorAdapter.getJpaPropertyMap().putAll(jpaProperties.getProperties());
-            return hibernateJpaVendorAdapter;
         }
     }
 }

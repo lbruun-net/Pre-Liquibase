@@ -15,30 +15,31 @@
  */
 package net.lbruun.springboot.preliquibase.utils;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.sql.DataSource;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 /**
  * Utility methods for Liquibase
- * 
+ *
  * @author lbruun
  */
 public class LiquibaseUtils {
-    
+
 
     private LiquibaseUtils() {
     }
-    
-    
+
+
     /**
      * Finds the Liquibase database {@code shortname} for a DataSource.
-     * 
+     *
      * <p>
      * Non-complete list of possible return values:
      * <ul>
@@ -59,11 +60,11 @@ public class LiquibaseUtils {
      * (These are the same values as those which can be used in a Liquibase
      * {@code dbms} Precondition. Refer to Liquibase documentation for further
      * information on possible values.)
-     * 
+     *
      * <p>
      * The method invokes {@code liquibase.database.DatabaseFactory#findCorrectDatabaseImplementation()}
      * and therefore requires Liquibase library on the classpath.
-     * 
+     *
      * <p>
      * The method works like this: The database is determined by connecting to
      * it and retrieving {@link java.sql.DatabaseMetaData} which is then matched
@@ -74,7 +75,7 @@ public class LiquibaseUtils {
      * Liquibase database shortname is returned as per the list above. The
      * connection used to determine the database type is closed again before the
      * method exits.
-     * 
+     *
      * @param dataSource input
      * @return Liquibase database shortname, always lower case, never null;
      * @throws PreLiquibaseException.ResolveDbPlatformError on all kinds of errors
@@ -85,7 +86,7 @@ public class LiquibaseUtils {
 
         // This gets convoluted and looks like Java 1.4 code. Ugly.
         // Mainly because the Liquibase classes do not support AutoCloseable.
-        
+
         // See SpringLiquibase.getDatabaseProductName() method from where
         // this code is pretty much copied.
         try {
@@ -95,9 +96,9 @@ public class LiquibaseUtils {
         } catch (SQLException ex1) {
             throw new PreLiquibaseException.ResolveDbPlatformError("Could not acquire connection for DataSource", ex1);
         } catch (DatabaseException ex2) {
-             throw new PreLiquibaseException.ResolveDbPlatformError("Error while finding Liquibase Database implementation for DataSource", ex2);
+            throw new PreLiquibaseException.ResolveDbPlatformError("Error while finding Liquibase Database implementation for DataSource", ex2);
         } catch (Exception ex3) {
-             throw new PreLiquibaseException.ResolveDbPlatformError("Unexpected error while finding Liquibase Database implementation for DataSource", ex3);
+            throw new PreLiquibaseException.ResolveDbPlatformError("Unexpected error while finding Liquibase Database implementation for DataSource", ex3);
         } finally {
             if (database != null) {
                 try {
@@ -119,5 +120,5 @@ public class LiquibaseUtils {
             }
         }
     }
-    
+
 }

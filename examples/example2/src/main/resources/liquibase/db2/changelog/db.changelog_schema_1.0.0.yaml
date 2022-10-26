@@ -33,7 +33,7 @@ databaseChangeLog:
                     nullable: false
         - addPrimaryKey:
             tableName: APP_EVENTS
-            columnNames: APP_EVENT_ID            
+            columnNames: APP_EVENT_ID
             constraintName: PK_APP_EVENTS
         #
         # ----------------------------------

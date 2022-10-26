@@ -15,9 +15,10 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * JPA Repository for 'AppEvent' entity.

@@ -15,14 +15,10 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db1;
 
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.LocalDate;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 /**
  * Example entity.
@@ -31,7 +27,6 @@ import jakarta.persistence.Table;
  * Note that as a matter of convention we use plural for table names ("PERSONS")
  * but singular for entities ("AppEvent"). However, it doesn't matter which
  * convention you use as long as you are consistent.
- *
  */
 @Entity
 @Table(name = "PERSONS")

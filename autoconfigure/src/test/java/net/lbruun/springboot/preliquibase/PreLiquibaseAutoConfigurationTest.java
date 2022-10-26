@@ -15,32 +15,34 @@
  */
 package net.lbruun.springboot.preliquibase;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Consumer;
-import javax.sql.DataSource;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.EmbeddedDataSourceConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.test.context.runner.ContextConsumer;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
+
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link PreLiquibaseAutoConfiguration}.
@@ -49,9 +51,15 @@ import org.springframework.core.io.Resource;
  */
 @ExtendWith(OutputCaptureExtension.class)
 public class PreLiquibaseAutoConfigurationTest {
-    
+
 
     private static final String JDBC_URL1 = "jdbc:hsqldb:mem:stdtest";
+    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(
+                    PreLiquibaseAutoConfiguration.class,
+                    LiquibaseAutoConfiguration.class))
+            .withPropertyValues("spring.datasource.generate-unique-name=true");
+
     @BeforeEach
     void init(TestInfo testInfo) {
         System.out.println();
@@ -59,17 +67,9 @@ public class PreLiquibaseAutoConfigurationTest {
         System.out.println("Running test : " + testInfo.getDisplayName());
     }
 
-
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(
-                    PreLiquibaseAutoConfiguration.class, 
-                    LiquibaseAutoConfiguration.class))
-            .withPropertyValues("spring.datasource.generate-unique-name=true");
-
-    
     @Test
     void mainTest() {
-        
+
         // This will also - indirectly - test if PreLiquibase executes before Liquibase.
         // If not, the schema 'myschema' will not have been created when Liquibase
         // executes and Liquibase will therefore fail.
@@ -81,13 +81,13 @@ public class PreLiquibaseAutoConfigurationTest {
                         "sql.script.schemaname=myschema",
                         "spring.liquibase.default-schema=myschema")
                 .run(assertPreLiquibase((preLiquibase) -> {
-                    
+
                     // Assert that PreLiquibase has resolved the db platform correctly
                     assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
 
                     // Assert that something was executed.
                     assertThat(preLiquibase.hasExecutedScripts()).isTrue();
-                                        
+
                     // Assert that only one script has executed
                     assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
 
@@ -96,7 +96,7 @@ public class PreLiquibaseAutoConfigurationTest {
 
                 }));
     }
-    
+
     @Test
     void backsOffIfNotEnabledPreLiquibase() {
         this.contextRunner
@@ -133,7 +133,7 @@ public class PreLiquibaseAutoConfigurationTest {
                 .withUserConfiguration(EmbeddedDataSourceConfiguration.class, PreLiquibaseUserConfiguration.class)
                 .withPropertyValues(
                         "sql.script.schemaname=myschema",
-                        "spring.datasource.url=" + JDBC_URL1)               
+                        "spring.datasource.url=" + JDBC_URL1)
                 .run((context) -> {
                     assertThat(context).hasBean("customPreLiquibase");
                     assertThat(context).doesNotHaveBean("preLiquibase");
@@ -142,11 +142,9 @@ public class PreLiquibaseAutoConfigurationTest {
     }
 
 
-
-
     @Test
     void sqlScriptsInCustomLocation() {
-        
+
         this.contextRunner
                 .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
                 .withPropertyValues(
@@ -155,13 +153,13 @@ public class PreLiquibaseAutoConfigurationTest {
                         "sql.script.schemaname=myschema",
                         "spring.liquibase.default-schema=myschema")
                 .run(assertPreLiquibase((preLiquibase) -> {
-                    
+
                     // Assert that PreLiquibase has resolved the db platform correctly
                     assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
 
                     // Assert that something was executed.
                     assertThat(preLiquibase.hasExecutedScripts()).isTrue();
-                                        
+
                     // Assert that two scripts has executed
                     assertThat(preLiquibase.getUnfilteredResources()).hasSize(2);
 
@@ -173,11 +171,7 @@ public class PreLiquibaseAutoConfigurationTest {
     }
 
 
-
-    
-    
-
-    // Utility methods    
+    // Utility methods
 
     private ContextConsumer<AssertableApplicationContext> assertPreLiquibase(Consumer<PreLiquibase> consumer) {
         return (context) -> {
@@ -188,20 +182,20 @@ public class PreLiquibaseAutoConfigurationTest {
     }
 
     private String getScriptFileName(PreLiquibase preLiquibase, int scriptNo) {
-        
+
         List<Resource> unfilteredResources = preLiquibase.getUnfilteredResources();
         if (unfilteredResources == null || ((unfilteredResources.size() - 1) < scriptNo)) {
             throw new RuntimeException("No such scriptNo");
         }
         Resource res = unfilteredResources.get(scriptNo);
-        
+
         try {
             return res.getURL().getPath();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
+
     @Configuration(proxyBeanMethods = false)
     static class LiquibaseDataSourceConfiguration {
 
@@ -235,8 +229,6 @@ public class PreLiquibaseAutoConfigurationTest {
                     properties,
                     applicationContext);
         }
-
-
 
 
     }

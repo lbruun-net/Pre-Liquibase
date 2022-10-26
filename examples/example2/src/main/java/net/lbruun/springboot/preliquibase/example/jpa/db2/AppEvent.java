@@ -15,18 +15,11 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
+import jakarta.persistence.*;
+import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
+
 import java.io.Serializable;
 import java.time.Instant;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
 
 /**
  * Example entity. Represents an "event" which happened in the application and
@@ -36,7 +29,6 @@ import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
  * Note that as a matter of convention we use plural for table names
  * ("APP_EVENTS") but singular for entities ("AppEvent"). However, it doesn't
  * matter which convention you use as long as you are consistent.
- *
  */
 @Entity
 @Table(name = "APP_EVENTS")
