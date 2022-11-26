@@ -27,7 +27,7 @@ This module solves this problem by allowing you to "deploy" such DB prerequisiti
 Typical use is to create database schema or database catalog so that Liquibase objects have "a home" where
 they can live.
 
-*Pre-Liquibase* is a Spring Boot v2 auto-configuration module. You only need to add the dependency as well 
+*Pre-Liquibase* is a Spring Boot auto-configuration module. You only need to add the dependency as well
 as the SQL script you want executed prior to Liquibase execution. There is no Java code for you to add to your project.
 
 WARNING: Whatever you put in your SQL script file(s) for this module should be something which Liquibase cannot handle.
@@ -102,7 +102,7 @@ Done!
 
 == Usage 
 
-The module is a Spring Boot V2 auto-configuration. Once you add the dependency to your application it will automatically
+The module is a Spring Boot auto-configuration. Once you add the dependency to your application it will automatically
 trigger its own auto-configuration if you also have Liquibase in your classpath. The module will make
 sure it always fires _before_ Liquibase itself. The module has no effect if you add it to
 a Spring Boot project which does not use Liquibase.
