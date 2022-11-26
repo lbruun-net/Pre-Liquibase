@@ -15,9 +15,24 @@
  */
 package net.lbruun.springboot.preliquibase;
 
+import net.lbruun.springboot.preliquibase.utils.LiquibaseUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.PlaceholderConfigurerSupport;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.config.SortedResourcesFactoryBean;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.datasource.init.ScriptException;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.util.StreamUtils;
+
+import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import net.lbruun.springboot.preliquibase.utils.LiquibaseUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,37 +45,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.PlaceholderConfigurerSupport;
-
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.config.SortedResourcesFactoryBean;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.jdbc.datasource.init.ScriptException;
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.springframework.util.StreamUtils;
-
 /**
  * DataSource initializer for Pre-Liquibase module.
- * 
+ *
  * <p>
  * This class locates and executes SQL scripts against a DataSource. It is meant
  * as a companion to Liquibase.
- * 
+ *
  * <p>
  * The SQL scripts to be executed are specified via the
  * {@link PreLiquibaseProperties#setSqlScriptReferences(java.util.List) sqlScriptReferences}
  * configuration property.
- * 
+ *
  * <p>
- * Prior to execution the SQL scripts are 'filtered through the environment'. 
+ * Prior to execution the SQL scripts are 'filtered through the environment'.
  * This means that placeholders in the SQL scripts on the form {@code ${propertname}}
  * or {@code ${propertname:defaultvalue}} are replaced with the appropriate
  * value from the
@@ -75,13 +73,13 @@ public class PreLiquibase {
     // org.springframework.boot.autoconfigure.jdbc.DataSourceInitializer class.
     // However, over time, the two now have much less in common.
 
-    
+
     private static final Logger logger = LoggerFactory.getLogger(PreLiquibase.class);
 
     private final DataSource dataSource;
     private final PreLiquibaseProperties properties;
     private final ResourceLoader resourceLoader;
-    private final Environment environment;    
+    private final Environment environment;
     private List<Resource> unfilteredResources;
     private List<Resource> filteredResources;
     private String dbPlatformCode;
@@ -92,12 +90,12 @@ public class PreLiquibase {
      * Create a new instance with the {@link DataSource} to initialize and its
      * matching {@link PreLiquibaseProperties configuration}.
      *
-     * @param environment the source for placeholder substitution in SQL scripts
-     * @param dataSource the JDBC datasource to initialize
-     * @param properties configuration for the Pre-Liquibase module
+     * @param environment    the source for placeholder substitution in SQL scripts
+     * @param dataSource     the JDBC datasource to initialize
+     * @param properties     configuration for the Pre-Liquibase module
      * @param resourceLoader the resource loader to use for locating (and
-     *     loading) SQL scripts. Can be null. This is typically your {@code ApplicationContext}.
-     *     If {@code null} then a {@link DefaultResourceLoader} is used.
+     *                       loading) SQL scripts. Can be null. This is typically your {@code ApplicationContext}.
+     *                       If {@code null} then a {@link DefaultResourceLoader} is used.
      */
     public PreLiquibase(Environment environment, DataSource dataSource, PreLiquibaseProperties properties, ResourceLoader resourceLoader) {
         this.environment = environment;
@@ -105,23 +103,23 @@ public class PreLiquibase {
         this.properties = properties;
         this.resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader(null);
     }
-    
+
     /**
      * Executes PreLiquibase.
-     * 
-     * @throws PreLiquibaseException.ResolveDbPlatformError if there are errors
-     *    while determining the type of database platform.
-     * @throws PreLiquibaseException.SqlScriptReadError if SQL script cannot be read
-     *     (as part of the variable substitution process)
-     * @throws PreLiquibaseException.SqlScriptVarError if placeholder variables in 
-     *  a SQL script cannot be resolved or if there are circular references in these
-     *  placeholders.
-     * @throws PreLiquibaseException.SqlScriptRefError if a SQL script specified 
-     *      in the {@link PreLiquibaseProperties#setSqlScriptReferences(java.util.List) sqlScriptReferences}
-     *      property cannot be found.
+     *
+     * @throws PreLiquibaseException.ResolveDbPlatformError             if there are errors
+     *                                                                  while determining the type of database platform.
+     * @throws PreLiquibaseException.SqlScriptReadError                 if SQL script cannot be read
+     *                                                                  (as part of the variable substitution process)
+     * @throws PreLiquibaseException.SqlScriptVarError                  if placeholder variables in
+     *                                                                  a SQL script cannot be resolved or if there are circular references in these
+     *                                                                  placeholders.
+     * @throws PreLiquibaseException.SqlScriptRefError                  if a SQL script specified
+     *                                                                  in the {@link PreLiquibaseProperties#setSqlScriptReferences(java.util.List) sqlScriptReferences}
+     *                                                                  property cannot be found.
      * @throws org.springframework.jdbc.datasource.init.ScriptException (or subclass) if there
-     *      are script execution errors. In case of a SQL error the {@code ScriptException}
-     *      will wrap an exception of type {@link java.sql.SQLException SQLException}.
+     *                                                                  are script execution errors. In case of a SQL error the {@code ScriptException}
+     *                                                                  will wrap an exception of type {@link java.sql.SQLException SQLException}.
      */
     public synchronized void execute() {
         if (!hasExecuted) {
@@ -135,6 +133,7 @@ public class PreLiquibase {
 
     /**
      * Gets the DataSource used by PreLiquibase.
+     *
      * @return datasource
      */
     public DataSource getDataSource() {
@@ -145,10 +144,10 @@ public class PreLiquibase {
      * Gets the SQL scripts executed by PreLiquibase.
      * (these are the "raw" SQL scripts, meaning <i>before</i> substitution
      * of variables in the script)
-     * 
+     *
      * @return sql scripts
      * @throws PreLiquibaseException.UninitializedError if the method is
-     *      invoked prior to {@link #execute()}.
+     *                                                  invoked prior to {@link #execute()}.
      */
     public List<Resource> getUnfilteredResources() {
         if (!hasExecuted) {
@@ -161,10 +160,10 @@ public class PreLiquibase {
      * Gets the SQL scripts executed by PreLiquibase.
      * (these are the "filtered" SQL scripts, meaning <i>after</i> substitution
      * of variables in the script)
-     * 
+     *
      * @return sql scripts
      * @throws PreLiquibaseException.UninitializedError if the method is
-     *      invoked prior to {@link #execute()}.
+     *                                                  invoked prior to {@link #execute()}.
      */
     public List<Resource> getFilteredResources() {
         if (!hasExecuted) {
@@ -177,12 +176,12 @@ public class PreLiquibase {
      * Gets the resolved {@code dbPlatformCode} as used by PreLiquibase. This can
      * either be a value which PreLiquibase has decided based on auto-detection
      * of the database platform in use, or it can be a value which was set
-     * explicitly by the user via the {@link PreLiquibaseProperties#setDbPlatformCode(java.lang.String) 
+     * explicitly by the user via the {@link PreLiquibaseProperties#setDbPlatformCode(java.lang.String)
      * dbPlatformCode} property.
-     * 
+     *
      * @return database platform code
      * @throws PreLiquibaseException.UninitializedError if the method is
-     *      invoked prior to {@link #execute()}.
+     *                                                  invoked prior to {@link #execute()}.
      */
     public String getDbPlatformCode() {
         if (!hasExecuted) {
@@ -198,10 +197,10 @@ public class PreLiquibase {
      *   <li>{@link PreLiquibaseProperties} {@code enabled} property was false.</li>
      *   <li>No SQL files were found to execute.</li>
      * </ul>
-     * 
+     *
      * @return true if at least one SQL script was executed (successfully or with error)
      * @throws PreLiquibaseException.UninitializedError if the method is
-     *      invoked prior to {@link #execute()}.
+     *                                                  invoked prior to {@link #execute()}.
      */
     public boolean hasExecutedScripts() {
         if (!hasExecuted) {
@@ -209,18 +208,14 @@ public class PreLiquibase {
         }
         return hasExecutedScripts;
     }
-    
-    
-    
-    
-    
+
 
     /**
      * Execute SQL sql scripts if required.
      *
      * @return {@code true} if the SQL script was attempted executed.
-     * @throws ScriptionException (or subclass) if a SQL script files cannot be read or there's 
-     *         a SQL execution error.
+     * @throws ScriptionException (or subclass) if a SQL script files cannot be read or there's
+     *                            a SQL execution error.
      */
     private boolean executeSQLScripts() {
 
@@ -270,8 +265,8 @@ public class PreLiquibase {
     }
 
     private List<Resource> getResourcesFromStringLocations(
-            List<String> locations, 
-            boolean validateExistence, 
+            List<String> locations,
+            boolean validateExistence,
             boolean onlyUseFirstScript) {
         List<Resource> resources = new ArrayList<>();
         for (String location : locations) {
@@ -301,7 +296,7 @@ public class PreLiquibase {
         }
     }
 
-    
+
     private List<Resource> getFilteredResources(List<Resource> resources) {
         if (resources == null || resources.isEmpty() || this.environment == null) {
             return resources;
@@ -313,10 +308,10 @@ public class PreLiquibase {
         // This means the SQL script can use property 'spring.liquibase.liquibase-schema'
         // even if this property is not set.
         Map<String, String> defaultsMapping = Stream.of(new String[][]{
-            {"spring.liquibase.liquibase-schema", "spring.liquibase.default-schema"},})
+                        {"spring.liquibase.liquibase-schema", "spring.liquibase.default-schema"},})
                 .collect(Collectors.toMap(data -> data[0], data -> data[1]));
-        
-        
+
+
         PreLiquibasePlaceholderResolver preLiquibasePlaceholderResolver
                 = new PreLiquibasePlaceholderResolver(this.environment, defaultsMapping);
         PropertyPlaceholderHelper placeholderReplacer = new PropertyPlaceholderHelper(
@@ -361,14 +356,16 @@ public class PreLiquibase {
         } else {
             logger.info("PreLiquibase: Executing SQL script : " + resources.get(0).toString());
         }
-       
+
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.setContinueOnError(this.properties.isContinueOnError());
         populator.setSeparator(this.properties.getSeparator());
         if (this.properties.getSqlScriptEncoding() != null) {
             populator.setSqlScriptEncoding(this.properties.getSqlScriptEncoding().name());
         }
-        resources.forEach(resource -> {populator.addScript(resource);});
+        resources.forEach(resource -> {
+            populator.addScript(resource);
+        });
         DatabasePopulatorUtils.execute(populator, this.dataSource);
     }
 
@@ -403,7 +400,6 @@ public class PreLiquibase {
     }
 
 
-
     /**
      * Spring {@link Resource} where the content is a string.
      *
@@ -429,11 +425,11 @@ public class PreLiquibase {
         /**
          * Creates an instance of StringShadowResource.
          *
-         * @param content the content of the Resource.
+         * @param content          the content of the Resource.
          * @param originalResource the original resource from where
-         * {@code content} originates.
-         * @param encoding used when the {@code content} is translated into an
-         * InputStream.
+         *                         {@code content} originates.
+         * @param encoding         used when the {@code content} is translated into an
+         *                         InputStream.
          */
         public StringShadowResource(String content, Resource originalResource, Charset encoding) {
             this.content = content;
@@ -496,7 +492,6 @@ public class PreLiquibase {
             return getDescription();
         }
     }
-
 
 
 }

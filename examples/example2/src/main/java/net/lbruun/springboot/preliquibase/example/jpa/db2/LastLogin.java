@@ -15,14 +15,11 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
+import jakarta.persistence.*;
+import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
+
 import java.io.Serializable;
 import java.time.Instant;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
 
 /**
  * Example entity.
@@ -31,7 +28,6 @@ import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
  * Note that as a matter of convention we use plural for table names
  * ("LAST_LOGINS") but singular for entities ("LastLogin"). However, it doesn't
  * matter which convention you use as long as you are consistent.
- *
  */
 @Entity
 @Table(name = "LAST_LOGINS")

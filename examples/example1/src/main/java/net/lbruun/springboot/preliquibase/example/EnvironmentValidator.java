@@ -15,8 +15,6 @@
  */
 package net.lbruun.springboot.preliquibase.example;
 
-import java.text.MessageFormat;
-import java.util.Locale;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -25,16 +23,19 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+
 /**
  * Validates Spring Environment properties <i>before</i> Spring Boot auto-configuration kicks in.
- * 
+ *
  * <p>
  * The purpose here is to make sure the "medusa.envName" property is not of mixed case
  * as it would wreak havoc in the way Liquibase works.
- * 
+ *
  * <p>
  * The processor must be registered in {@code META-INF/spring.factories}.
- * 
+ *
  * @author lbruun
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -59,11 +60,11 @@ public class EnvironmentValidator implements EnvironmentPostProcessor {
             throw new IllegalStateException(MessageFormat.format(msgFormat, "Property " + envNamePropName, envNameVal));
         }
     }
-    
+
     private boolean isMixedCase(String value) {
         return !(value.toLowerCase(Locale.US).equals(value) || value.toUpperCase(Locale.US).equals(value));
     }
-    
+
     private boolean isOsEnvVarDefined(ConfigurableEnvironment environment, String propertyName) {
         PropertySource<?> propertySource = environment.getPropertySources().get(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
         return (propertySource != null && propertySource.containsProperty(propertyName));

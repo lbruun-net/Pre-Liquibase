@@ -28,8 +28,8 @@ public class JpaPropertiesEnchanced extends JpaProperties {
     /**
      * Get Persistence Unit name,
      *
-     * @see #setPersistenceUnitName(java.lang.String)
      * @return name
+     * @see #setPersistenceUnitName(java.lang.String)
      */
     public String getPersistenceUnitName() {
         return persistenceUnitName;

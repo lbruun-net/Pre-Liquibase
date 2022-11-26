@@ -15,9 +15,10 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa;
 
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+
 import java.time.Instant;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 
 /**
  * JPA Converter between Java Instant and {@code long}. This allows timestamps

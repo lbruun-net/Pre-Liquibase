@@ -15,8 +15,6 @@
  */
 package net.lbruun.springboot.preliquibase;
 
-import java.util.Objects;
-import javax.sql.DataSource;
 import liquibase.change.DatabaseChange;
 import liquibase.integration.spring.SpringLiquibase;
 import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.EnabledCondition;
@@ -26,14 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AbstractDependsOnBeanFactoryPostProcessor;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
-import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
@@ -44,21 +36,21 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ConfigurationCondition.ConfigurationPhase;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
+
+import javax.sql.DataSource;
+import java.util.Objects;
 
 /**
  * Auto-configuration for Pre-Liquibase.
  *
  * @author lbruun
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = {DataSourceAutoConfiguration.class}, before = {LiquibaseAutoConfiguration.class})
 @ConditionalOnClass({SpringLiquibase.class, DatabaseChange.class})
 @Conditional({LiquibaseDataSourceCondition.class, EnabledCondition.class})
 @ConditionalOnMissingBean({SpringLiquibase.class, PreLiquibase.class})
-@AutoConfigureAfter({DataSourceAutoConfiguration.class})
-@AutoConfigureBefore({LiquibaseAutoConfiguration.class})
 @EnableConfigurationProperties({DataSourceProperties.class, LiquibaseProperties.class, PreLiquibaseProperties.class})
 public class PreLiquibaseAutoConfiguration {
 
@@ -113,7 +105,6 @@ public class PreLiquibaseAutoConfiguration {
      * <i>before</i> the standard Liquibase bean. Note that rather than
      * declaring that Pre-Liquibase must execute before Liquibase, we declare
      * the opposite: that Liquibase must execute after Pre-Liquibase.
-     *
      */
     @Configuration()
     @ConditionalOnClass(SpringLiquibase.class)
@@ -150,9 +141,9 @@ public class PreLiquibaseAutoConfiguration {
 
     /**
      * Condition that says that both of the properties
-     *
+     * <p>
      * 'preliquibase.enabled' 'spring.liquibase.enabled'
-     *
+     * <p>
      * must not have a value of "false"Â´or the property must be absent.
      */
     static final class EnabledCondition extends AllNestedConditions {
@@ -189,16 +180,16 @@ public class PreLiquibaseAutoConfiguration {
          * Determine DataSource (based on input) which Liquibase itself is
          * using.
          *
-         * @param liquibaseProperties Spring Boot properties for Liquibase
-         * ("spring.liquibase")
+         * @param liquibaseProperties  Spring Boot properties for Liquibase
+         *                             ("spring.liquibase")
          * @param dataSourceProperties Spring Boot properties for DataSource
-         * ("spring.datasource")
-         * @param dataSource general DataSource (if any)
-         * @param liquibaseDataSource designated DataSource for Liquibase (if
-         * any). This is typically a DataSource which has been annotated with
-         * {@code @LiquibaseDataSource} in order to mark it as designated for
-         * Liquibase. If this DataSource exists it will be used in preference to
-         * a DataSource in {@code dataSource} parameter.
+         *                             ("spring.datasource")
+         * @param dataSource           general DataSource (if any)
+         * @param liquibaseDataSource  designated DataSource for Liquibase (if
+         *                             any). This is typically a DataSource which has been annotated with
+         *                             {@code @LiquibaseDataSource} in order to mark it as designated for
+         *                             Liquibase. If this DataSource exists it will be used in preference to
+         *                             a DataSource in {@code dataSource} parameter.
          */
         public DefaultPreLiquibaseDataSourceProvider(
                 @NonNull LiquibaseProperties liquibaseProperties,

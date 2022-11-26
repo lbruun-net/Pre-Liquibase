@@ -15,18 +15,20 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa;
 
-import java.time.LocalDate;
-import java.util.Optional;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
- * Example Unit test. Not meant to be a show case for 
+ * Example Unit test. Not meant to be a show case for
  * best practice of writing Spring Boot JPA unit tests.
- *
- * The main point here is that you can use the @DataJpaTest 
+ * <p>
+ * The main point here is that you can use the @DataJpaTest
  * annotation because it will include Pre-Liquibase auto-configuration
  */
 @DataJpaTest
@@ -40,17 +42,17 @@ public class PersonRepoTest {
     void injectedComponentsAreNotNull() {
         assertThat(personRepo).isNotNull();
     }
-    
+
     @Test
     void saveAndRetrievePerson() {
-        
+
         Person person = new Person();
         person.setPersonId(1001L);
         person.setFirstName("John");
         person.setLastName("Doe");
         person.setBirthDate(LocalDate.of(1996, 12, 4));
         personRepo.save(person);
-        
+
         // See if we can find the person we just saved
         Optional<Person> personOpt = personRepo.findById(1001L);
         assertThat(personOpt).isNotEmpty();

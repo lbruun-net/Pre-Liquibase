@@ -33,5 +33,5 @@ databaseChangeLog:
                     nullable: false
         - addPrimaryKey:
             tableName: PERSONS
-            columnNames: PERSON_ID            
+            columnNames: PERSON_ID
             constraintName: PK_PERSONS

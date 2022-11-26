@@ -26,6 +26,7 @@ public interface PreLiquibaseDataSourceProvider {
 
     /**
      * Gets the DataSource to use for Pre-Liquibase execution.
+     *
      * @return a non-null value
      */
     DataSource getDataSource();
