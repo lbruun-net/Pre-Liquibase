@@ -358,7 +358,7 @@ Current version works with Spring Boot 3.0+ and has been tested with version 3.0
 should not work with any future 3.x release of Spring Boot.
 
 
-[cols=4*,options=header]
+[cols=5*,options=header]
 |===
 |Pre-Liquibase version
 |Spring Boot compatibility
