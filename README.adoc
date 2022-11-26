@@ -255,7 +255,7 @@ You should work on that first and only use this setting as a last resort.
 |separator
 |String
 |;
-|The statement separator used in the SQL script. For most database engines this is the semi-colon character.
+|The statement separator used in the SQL script(s).
 
 |sqlScriptEncoding
 |String
