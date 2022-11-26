@@ -14,7 +14,7 @@ Example application **Medusa** showcases how the Pre-Liquibase module
 might be used for a Spring Boot based application which uses *multiple data sources*.
 
 Like Example 1, the aim of Pre-Liquibase in this application is to ensure that a database "home" 
-(a schema) exists for the currrent instance of the application. This way multiple 
+(a schema) exists for the current instance of the application. This way multiple
 instances of the application can all use the same database server and the same database 
 identity, yet inside the database server the various instances are duly separated by schema.
 
@@ -23,7 +23,7 @@ in the traditional sense (see Example1). Therefore, most beans must be configure
 
 This example application uses
 
-- Spring Boot 2
+- Spring Boot 3
 - Spring Data JPA (Hibernate) - with multiple data sources
 - Liquibase
 
