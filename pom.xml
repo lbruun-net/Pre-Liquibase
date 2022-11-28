@@ -30,8 +30,9 @@ limitations under the License.
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.scm.id>github.com-lbruun.net</project.scm.id>
         <spring.boot.version>3.0.0</spring.boot.version>
     </properties>
@@ -89,7 +90,6 @@ limitations under the License.
             </dependency>
         </dependencies>
     </dependencyManagement>
-
 
     <build>
 
@@ -152,6 +152,25 @@ limitations under the License.
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-toolchains-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <toolchains>
+                        <jdk>
+                            <version>${java.version}</version>
+                        </jdk>
+                    </toolchains>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>toolchain</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
