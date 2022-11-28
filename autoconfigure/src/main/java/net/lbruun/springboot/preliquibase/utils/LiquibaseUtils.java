@@ -20,16 +20,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
+
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException.ResolveDbPlatformError;
+<<<<<<< HEAD
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+=======
+>>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
 
 /**
  * Utility methods for Liquibase
@@ -37,12 +41,18 @@ import java.sql.SQLException;
  * @author lbruun
  */
 public class LiquibaseUtils {
+<<<<<<< HEAD
 
+=======
+>>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
 
     private LiquibaseUtils() {
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
     /**
      * Finds the Liquibase database {@code shortname} for a DataSource.
      *
@@ -87,6 +97,7 @@ public class LiquibaseUtils {
      * @throws PreLiquibaseException.ResolveDbPlatformError on all kinds of errors
      */
     public static String getLiquibaseDatabaseShortName(DataSource dataSource) {
+<<<<<<< HEAD
       // See SpringLiquibase.getDatabaseProductName() method from where
       // this code is pretty much copied.
       try (Connection connection = dataSource.getConnection();
@@ -100,6 +111,21 @@ public class LiquibaseUtils {
       } catch (final Exception e) {
           throw new ResolveDbPlatformError("Unexpected error while finding Liquibase Database implementation for DataSource", e);
       }
+=======
+        // See SpringLiquibase.getDatabaseProductName() method from where
+        // this code is pretty much copied.
+        try (Connection connection = dataSource.getConnection();
+                Database database = DatabaseFactory.getInstance()
+                        .findCorrectDatabaseImplementation(new JdbcConnection(connection));) {
+            return database.getShortName();
+        } catch (final SQLException e) {
+            throw new ResolveDbPlatformError("Could not acquire connection for DataSource", e);
+        } catch (final DatabaseException e) {
+            throw new ResolveDbPlatformError("Error while finding Liquibase Database implementation for DataSource", e);
+        } catch (final Exception e) {
+            throw new ResolveDbPlatformError("Unexpected error while finding Liquibase Database implementation for DataSource", e);
+        }
+>>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
     }
 
 }

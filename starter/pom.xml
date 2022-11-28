@@ -28,7 +28,10 @@ limitations under the License.
     <name>Spring Boot AutoConfiguration :: Pre-Liquibase Starter</name>
 
     <description>Bootstrapping for Pre-Liquibase</description>
+<<<<<<< HEAD
 
+=======
+>>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
 
     <dependencies>
         <dependency>
@@ -38,7 +41,10 @@ limitations under the License.
         <dependency>
             <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
+<<<<<<< HEAD
             <version>${project.version}</version>
+=======
+>>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
         </dependency>
     </dependencies>
 
