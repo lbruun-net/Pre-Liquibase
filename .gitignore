@@ -20,6 +20,7 @@ buildNumber.properties
 .classpath
 .project
 .settings/
+.factorypath
 
 # Ignore IntelliJ IDEA stuff
 .idea/
