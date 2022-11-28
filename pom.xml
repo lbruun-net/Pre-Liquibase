@@ -25,6 +25,7 @@ limitations under the License.
     <modules>
         <module>autoconfigure</module>
         <module>starter</module>
+
         <module>examples/example1</module>
         <module>examples/example2</module>
     </modules>
@@ -90,12 +91,12 @@ limitations under the License.
             <dependency>
                 <groupId>net.lbruun.springboot</groupId>
                 <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
-                <version>1.1.2-SNAPSHOT</version>
+                <version>1.3.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>net.lbruun.springboot</groupId>
                 <artifactId>preliquibase-spring-boot-starter</artifactId>
-                <version>1.1.2-SNAPSHOT</version>
+                <version>1.3.1-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -191,7 +192,7 @@ limitations under the License.
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.4</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -201,23 +202,23 @@ limitations under the License.
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.4.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--                        <version>3.4.1</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>attach-javadocs</id>-->
+<!--                                <goals>-->
+<!--                                    <goal>jar</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

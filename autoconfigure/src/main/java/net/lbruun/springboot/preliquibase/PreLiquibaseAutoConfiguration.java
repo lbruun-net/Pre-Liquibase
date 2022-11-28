@@ -15,17 +15,20 @@
  */
 package net.lbruun.springboot.preliquibase;
 
-import liquibase.change.DatabaseChange;
-import liquibase.integration.spring.SpringLiquibase;
-import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.EnabledCondition;
-import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.LiquibaseDataSourceCondition;
+import java.util.Objects;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AbstractDependsOnBeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
@@ -38,9 +41,10 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
-
-import javax.sql.DataSource;
-import java.util.Objects;
+import liquibase.change.DatabaseChange;
+import liquibase.integration.spring.SpringLiquibase;
+import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.EnabledCondition;
+import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.LiquibaseDataSourceCondition;
 
 /**
  * Auto-configuration for Pre-Liquibase.
@@ -56,13 +60,13 @@ public class PreLiquibaseAutoConfiguration {
 
     Logger logger = LoggerFactory.getLogger(PreLiquibaseAutoConfiguration.class);
 
-    /**
-     * Returns provider which will tell which {@code DataSource} to use for
-     * Pre-Liquibase. This will return a provider which will resolve to the same
-     * DataSource as used by Liquibase itself, however an application can
-     * configure its own bean of type {@code PreLiquibaseDataSourceProvider} and
-     * thereby override which DataSource to use for Pre-Liquibase.
-     */
+  /**
+   * Returns provider which will tell which {@code DataSource} to use for Pre-Liquibase. This will
+   * return a provider which will resolve to the same DataSource as used by Liquibase itself,
+   * however an application can configure its own bean of type
+   * {@code PreLiquibaseDataSourceProvider} and thereby override which DataSource to use for
+   * Pre-Liquibase.
+   */
     @ConditionalOnMissingBean({PreLiquibaseDataSourceProvider.class})
     @Bean
     public PreLiquibaseDataSourceProvider preLiquibaseDataSourceProvider(
@@ -89,7 +93,7 @@ public class PreLiquibaseAutoConfiguration {
             ApplicationContext applicationContext) {
         logger.debug("Instantiation of PreLiquibase");
 
-        PreLiquibase preLiquibase = new PreLiquibase(
+        final PreLiquibase preLiquibase = new PreLiquibase(
                 environment,
                 dataSourceProvider.getDataSource(),
                 properties,
@@ -106,10 +110,9 @@ public class PreLiquibaseAutoConfiguration {
      * declaring that Pre-Liquibase must execute before Liquibase, we declare
      * the opposite: that Liquibase must execute after Pre-Liquibase.
      */
-    @Configuration()
+    @Configuration
     @ConditionalOnClass(SpringLiquibase.class)
-    static class LiquibaseOnPreLiquibaseDependencyPostProcessor
-            extends AbstractDependsOnBeanFactoryPostProcessor {
+    static class LiquibaseOnPreLiquibaseDependencyPostProcessor extends AbstractDependsOnBeanFactoryPostProcessor {
 
         Logger logger = LoggerFactory.getLogger(LiquibaseOnPreLiquibaseDependencyPostProcessor.class);
 
@@ -125,7 +128,6 @@ public class PreLiquibaseAutoConfiguration {
      * Liquibase.
      */
     static final class LiquibaseDataSourceCondition extends AnyNestedCondition {
-
         LiquibaseDataSourceCondition() {
             super(ConfigurationPhase.REGISTER_BEAN);
         }
@@ -197,19 +199,17 @@ public class PreLiquibaseAutoConfiguration {
                 @NonNull ObjectProvider<DataSource> dataSource,
                 @NonNull ObjectProvider<DataSource> liquibaseDataSource) {
 
-            // Here we re-use Spring Boot's own LiquibaseAutoConfiguration
-            // so that we figure out which DataSource will (later) be used
-            // by LiquibaseAutoConfiguration. This ensures that we use the same
-            // logic for figuring out which DataSource to use.
-            // Note that SpringLiquibase object below gets instantiated OUTSIDE
-            // of the IoC container, meaning it is just normal "new" instantiaion.
-            // This is important as we do not want the SpringLiquibase's 
-            // afterPropertiesSet method to kick in. All we are interested in 
-            // is to figure out which datasource Liquibase would be using.
-            LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration
-                    = new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
-            SpringLiquibase liquibase = liquibaseConfiguration.liquibase(
-                    dataSource, liquibaseDataSource);
+          // Here we re-use Spring Boot's own LiquibaseAutoConfiguration
+          // so that we figure out which DataSource will (later) be used
+          // by LiquibaseAutoConfiguration. This ensures that we use the same
+          // logic for figuring out which DataSource to use.
+          // Note that SpringLiquibase object below gets instantiated OUTSIDE
+          // of the IoC container, meaning it is just normal "new" instantiaion.
+          // This is important as we do not want the SpringLiquibase's 
+          // afterPropertiesSet method to kick in. All we are interested in 
+          // is to figure out which datasource Liquibase would be using.
+          final LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration = new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
+          final SpringLiquibase liquibase = liquibaseConfiguration.liquibase(dataSource, liquibaseDataSource);
 
             // Sanity check
             Objects.requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");

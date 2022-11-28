@@ -28,7 +28,6 @@ public abstract class PreLiquibaseException extends RuntimeException {
 
     public PreLiquibaseException(String message, Throwable cause) {
         super(message, cause);
-
     }
 
     /**

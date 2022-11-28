@@ -1,25 +1,19 @@
 /*
  * Copyright 2021 lbruun.net.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package net.lbruun.springboot.preliquibase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-<<<<<<< HEAD
-
-=======
->>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
@@ -45,13 +39,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfigurationTest.LiquibaseDataSourceConfiguration.PreLiquibaseUserConfiguration;
 
 /**
  * Tests for {@link PreLiquibaseAutoConfiguration}.
@@ -68,25 +56,9 @@ class PreLiquibaseAutoConfigurationTest {
     System.out.println("\n\nRunning test : " + testInfo.getDisplayName());
   }
 
-<<<<<<< HEAD
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-      .withConfiguration(
-          AutoConfigurations.of(
-                    PreLiquibaseAutoConfiguration.class,
-                    LiquibaseAutoConfiguration.class))
-            .withPropertyValues("spring.datasource.generate-unique-name=true");
-
-    @BeforeEach
-    void init(TestInfo testInfo) {
-        System.out.println();
-        System.out.println();
-        System.out.println("Running test : " + testInfo.getDisplayName());
-=======
   private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-      .withConfiguration(
-          AutoConfigurations.of(
-              PreLiquibaseAutoConfiguration.class,
-              LiquibaseAutoConfiguration.class))
+      .withConfiguration(AutoConfigurations.of(PreLiquibaseAutoConfiguration.class,
+          LiquibaseAutoConfiguration.class))
       .withPropertyValues("spring.datasource.generate-unique-name=true");
 
   @Test
@@ -97,10 +69,8 @@ class PreLiquibaseAutoConfigurationTest {
     // executes and Liquibase will therefore fail.
 
     contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-        .withPropertyValues(
-            "spring.datasource.url=" + JDBC_URL1,
-            "sql.script.schemaname=myschema",
-            "spring.liquibase.default-schema=myschema")
+        .withPropertyValues("spring.datasource.url = " + JDBC_URL1,
+            "sql.script.schemaname = myschema", "spring.liquibase.default-schema = myschema")
         .run(assertPreLiquibase(preLiquibase -> {
 
           // Assert that PreLiquibase has resolved the db platform correctly
@@ -120,29 +90,23 @@ class PreLiquibaseAutoConfigurationTest {
 
   @Test
   void backsOffIfNotEnabledPreLiquibase() {
-    contextRunner
-        .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-        .withPropertyValues(
-            "preliquibase.enabled=false",
-            "spring.datasource.url=" + JDBC_URL1)
+    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class)
+        .withPropertyValues("preliquibase.enabled = false", "spring.datasource.url = " + JDBC_URL1)
         .run(context -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
   }
 
   @Test
   void backsOffIfNotEnabledLiquibase() {
-    contextRunner
-        .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-        .withPropertyValues(
-            "spring.liquibase.enabled=false",
-            "spring.datasource.url=" + JDBC_URL1)
+    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class)
+        .withPropertyValues("spring.liquibase.enabled = false",
+            "spring.datasource.url = " + JDBC_URL1)
         .run(context -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
   }
 
   @Test
   void backsOffIfNoLiquibaseOnClasspath() {
-    contextRunner
-        .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-        .withPropertyValues("spring.datasource.url=" + JDBC_URL1)
+    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class)
+        .withPropertyValues("spring.datasource.url = " + JDBC_URL1)
         .withClassLoader(new FilteredClassLoader("liquibase"))
         .run(context -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
   }
@@ -150,27 +114,23 @@ class PreLiquibaseAutoConfigurationTest {
   @Test
   void backsOffIfCustomDefinedPreLiquibase() {
     contextRunner
-        .withUserConfiguration(EmbeddedDataSourceConfiguration.class, PreLiquibaseUserConfiguration.class)
-        .withPropertyValues(
-            "sql.script.schemaname=myschema",
-            "spring.datasource.url=" + JDBC_URL1)
+        .withUserConfiguration(EmbeddedDataSourceConfiguration.class,
+            PreLiquibaseUserConfiguration.class)
+        .withPropertyValues("sql.script.schemaname = myschema",
+            "spring.datasource.url = " + JDBC_URL1)
         .run(context -> {
           assertThat(context).hasBean("customPreLiquibase");
           assertThat(context).doesNotHaveBean("preLiquibase");
         });
-
   }
 
   @Test
   void sqlScriptsInCustomLocation() {
 
-    contextRunner
-        .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-        .withPropertyValues(
-            "spring.datasource.url=" + JDBC_URL1,
-            "preliquibase.sql-script-references=file:src/test/resources/preliquibase-customlocation/hsqldb.sql,file:src/test/resources/preliquibase-customlocation/default.sql",
-            "sql.script.schemaname=myschema",
-            "spring.liquibase.default-schema=myschema")
+    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class).withPropertyValues(
+        "spring.datasource.url = " + JDBC_URL1,
+        "preliquibase.sql-script-references = file:src/test/resources/preliquibase-customlocation/hsqldb.sql,file:src/test/resources/preliquibase-customlocation/default.sql",
+        "sql.script.schemaname = myschema", "spring.liquibase.default-schema = myschema")
         .run(assertPreLiquibase(preLiquibase -> {
 
           // Assert that PreLiquibase has resolved the db platform correctly
@@ -183,15 +143,18 @@ class PreLiquibaseAutoConfigurationTest {
           assertThat(preLiquibase.getUnfilteredResources()).hasSize(2);
 
           // Assert which script was executed
-          assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase-customlocation/hsqldb.sql");
-          assertThat(getScriptFileName(preLiquibase, 1)).endsWith("preliquibase-customlocation/default.sql");
+          assertThat(getScriptFileName(preLiquibase, 0))
+              .endsWith("preliquibase-customlocation/hsqldb.sql");
+          assertThat(getScriptFileName(preLiquibase, 1))
+              .endsWith("preliquibase-customlocation/default.sql");
 
         }));
   }
 
   // Utility methods
 
-  private ContextConsumer<AssertableApplicationContext> assertPreLiquibase(Consumer<PreLiquibase> consumer) {
+  private ContextConsumer<AssertableApplicationContext> assertPreLiquibase(
+      Consumer<PreLiquibase> consumer) {
     return context -> {
       assertThat(context).hasSingleBean(PreLiquibase.class);
       final PreLiquibase preLiquibase = context.getBean(PreLiquibase.class);
@@ -221,204 +184,26 @@ class PreLiquibaseAutoConfigurationTest {
     @Primary
     DataSource normalDataSource() {
       return DataSourceBuilder.create().url("jdbc:hsqldb:mem:normal").username("sa").build();
->>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
     }
 
-<<<<<<< HEAD
-    @Test
-    void mainTest() {
-
-        // This will also - indirectly - test if PreLiquibase executes before Liquibase.
-        // If not, the schema 'myschema' will not have been created when Liquibase
-        // executes and Liquibase will therefore fail.
-
-        this.contextRunner
-                .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-                .withPropertyValues(
-                        "spring.datasource.url=" + JDBC_URL1,
-                        "sql.script.schemaname=myschema",
-                        "spring.liquibase.default-schema=myschema")
-                .run(assertPreLiquibase((preLiquibase) -> {
-
-                    // Assert that PreLiquibase has resolved the db platform correctly
-                    assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
-
-                    // Assert that something was executed.
-                    assertThat(preLiquibase.hasExecutedScripts()).isTrue();
-
-                    // Assert that only one script has executed
-                    assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
-
-                    // Assert which script was executed
-                    assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase/hsqldb.sql");
-
-                }));
-    }
-
-    @Test
-    void backsOffIfNotEnabledPreLiquibase() {
-        this.contextRunner
-                .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-                .withPropertyValues(
-                        "preliquibase.enabled=false",
-                        "spring.datasource.url=" + JDBC_URL1)
-                .run((context) -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
-=======
     @LiquibaseDataSource
     @Bean
     DataSource liquibaseDataSource() {
       return DataSourceBuilder.create().url("jdbc:hsqldb:mem:liquibasetest").username("sa").build();
->>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
-    }
-
-<<<<<<< HEAD
-
-  @Test
-  void backsOffIfNotEnabledLiquibase() {
-    contextRunner
-        .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-        .withPropertyValues(
-            "spring.liquibase.enabled=false",
-            "spring.datasource.url=" + JDBC_URL1)
-        .run(context -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
-=======
->>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
-  }
-
-  @Configuration(proxyBeanMethods = false)
-  @EnableConfigurationProperties({PreLiquibaseProperties.class})
-  static class PreLiquibaseUserConfiguration {
-
-    @Bean
-    public PreLiquibase customPreLiquibase(
-        Environment environment,
-        PreLiquibaseProperties properties,
-        ApplicationContext applicationContext) {
-
-      return new PreLiquibase(
-          environment,
-          DataSourceBuilder.create().url(JDBC_URL1).build(),
-          properties,
-          applicationContext);
-    }
-<<<<<<< HEAD
-
-    @Test
-    void backsOffIfNoLiquibaseOnClasspath() {
-        this.contextRunner
-                .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-                .withPropertyValues(
-                        "spring.datasource.url=" + JDBC_URL1)
-                .withClassLoader(new FilteredClassLoader("liquibase"))
-                .run((context) -> assertThat(context).doesNotHaveBean(PreLiquibase.class));
-    }
-
-    @Test
-    void backsOffIfCustomDefinedPreLiquibase() {
-        this.contextRunner
-                .withUserConfiguration(EmbeddedDataSourceConfiguration.class, PreLiquibaseUserConfiguration.class)
-                .withPropertyValues(
-                        "sql.script.schemaname=myschema",
-                        "spring.datasource.url=" + JDBC_URL1)
-                .run((context) -> {
-                    assertThat(context).hasBean("customPreLiquibase");
-                    assertThat(context).doesNotHaveBean("preLiquibase");
-                });
-
-    }
-
-
-    @Test
-    void sqlScriptsInCustomLocation() {
-
-        this.contextRunner
-                .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-                .withPropertyValues(
-                        "spring.datasource.url=" + JDBC_URL1,
-            "preliquibase.sql-script-references=file:src/test/resources/preliquibase-customlocation/hsqldb.sql,file:src/test/resources/preliquibase-customlocation/default.sql",
-                        "sql.script.schemaname=myschema",
-                        "spring.liquibase.default-schema=myschema")
-                .run(assertPreLiquibase((preLiquibase) -> {
-
-                    // Assert that PreLiquibase has resolved the db platform correctly
-                    assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
-
-                    // Assert that something was executed.
-                    assertThat(preLiquibase.hasExecutedScripts()).isTrue();
-
-                    // Assert that two scripts has executed
-                    assertThat(preLiquibase.getUnfilteredResources()).hasSize(2);
-
-                    // Assert which script was executed
-                    assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase-customlocation/hsqldb.sql");
-                    assertThat(getScriptFileName(preLiquibase, 1)).endsWith("preliquibase-customlocation/default.sql");
-
-                }));
-    }
-
-
-    // Utility methods
-
-    private ContextConsumer<AssertableApplicationContext> assertPreLiquibase(Consumer<PreLiquibase> consumer) {
-        return (context) -> {
-            assertThat(context).hasSingleBean(PreLiquibase.class);
-            PreLiquibase preLiquibase = context.getBean(PreLiquibase.class);
-            consumer.accept(preLiquibase);
-        };
-    }
-
-    private String getScriptFileName(PreLiquibase preLiquibase, int scriptNo) {
-
-        List<Resource> unfilteredResources = preLiquibase.getUnfilteredResources();
-        if (unfilteredResources == null || ((unfilteredResources.size() - 1) < scriptNo)) {
-            throw new RuntimeException("No such scriptNo");
-        }
-        Resource res = unfilteredResources.get(scriptNo);
-
-        try {
-            return res.getURL().getPath();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    static class LiquibaseDataSourceConfiguration {
-
-        @Bean
-        @Primary
-        DataSource normalDataSource() {
-            return DataSourceBuilder.create().url("jdbc:hsqldb:mem:normal").username("sa").build();
-        }
-
-        @LiquibaseDataSource
-        @Bean
-        DataSource liquibaseDataSource() {
-            return DataSourceBuilder.create().url("jdbc:hsqldb:mem:liquibasetest").username("sa").build();
-        }
-
     }
 
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties({PreLiquibaseProperties.class})
     static class PreLiquibaseUserConfiguration {
 
-        @Bean
-        public PreLiquibase customPreLiquibase(
-                Environment environment,
-                PreLiquibaseProperties properties,
-                ApplicationContext applicationContext) {
+      @Bean
+      public PreLiquibase customPreLiquibase(Environment environment,
+          PreLiquibaseProperties properties, ApplicationContext applicationContext) {
 
-            return new PreLiquibase(
-                    environment,
-                    DataSourceBuilder.create().url(JDBC_URL1).build(),
-                    properties,
-                    applicationContext);
-        }
-
+        return new PreLiquibase(environment, DataSourceBuilder.create().url(JDBC_URL1).build(),
+            properties, applicationContext);
+      }
 
     }
-=======
   }
->>>>>>> branch 'handle_closeable_connexion_and_database' of https://github.com/zorglube/Pre-Liquibase.git
 }
