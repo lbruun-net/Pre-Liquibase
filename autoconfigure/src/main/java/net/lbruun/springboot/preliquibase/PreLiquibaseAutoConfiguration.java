@@ -15,43 +15,49 @@
  */
 package net.lbruun.springboot.preliquibase;
 
-import liquibase.change.DatabaseChange;
-import liquibase.integration.spring.SpringLiquibase;
-import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.EnabledCondition;
-import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.LiquibaseDataSourceCondition;
+import static java.util.Objects.requireNonNull;
+
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AbstractDependsOnBeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 
-import javax.sql.DataSource;
-import java.util.Objects;
+import liquibase.change.DatabaseChange;
+import liquibase.integration.spring.SpringLiquibase;
+import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.EnabledCondition;
+import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.LiquibaseDataSourceCondition;
 
 /**
  * Auto-configuration for Pre-Liquibase.
  *
  * @author lbruun
  */
-@AutoConfiguration(after = {DataSourceAutoConfiguration.class}, before = {LiquibaseAutoConfiguration.class})
-@ConditionalOnClass({SpringLiquibase.class, DatabaseChange.class})
-@Conditional({LiquibaseDataSourceCondition.class, EnabledCondition.class})
-@ConditionalOnMissingBean({SpringLiquibase.class, PreLiquibase.class})
-@EnableConfigurationProperties({DataSourceProperties.class, LiquibaseProperties.class, PreLiquibaseProperties.class})
+@AutoConfiguration(after = { DataSourceAutoConfiguration.class }, before = { LiquibaseAutoConfiguration.class })
+@ConditionalOnClass({ SpringLiquibase.class, DatabaseChange.class })
+@Conditional({ LiquibaseDataSourceCondition.class, EnabledCondition.class })
+@ConditionalOnMissingBean({ SpringLiquibase.class, PreLiquibase.class })
+@EnableConfigurationProperties({ DataSourceProperties.class, LiquibaseProperties.class, PreLiquibaseProperties.class })
 public class PreLiquibaseAutoConfiguration {
 
     Logger logger = LoggerFactory.getLogger(PreLiquibaseAutoConfiguration.class);
@@ -63,7 +69,7 @@ public class PreLiquibaseAutoConfiguration {
      * configure its own bean of type {@code PreLiquibaseDataSourceProvider} and
      * thereby override which DataSource to use for Pre-Liquibase.
      */
-    @ConditionalOnMissingBean({PreLiquibaseDataSourceProvider.class})
+    @ConditionalOnMissingBean({ PreLiquibaseDataSourceProvider.class })
     @Bean
     public PreLiquibaseDataSourceProvider preLiquibaseDataSourceProvider(
             LiquibaseProperties liquibaseProperties,
@@ -85,15 +91,13 @@ public class PreLiquibaseAutoConfiguration {
     public PreLiquibase preLiquibase(
             Environment environment,
             PreLiquibaseProperties properties,
-            PreLiquibaseDataSourceProvider dataSourceProvider,
-            ApplicationContext applicationContext) {
+            PreLiquibaseDataSourceProvider dataSourceProvider) {
         logger.debug("Instantiation of PreLiquibase");
 
-        PreLiquibase preLiquibase = new PreLiquibase(
+        final PreLiquibase preLiquibase = new PreLiquibase(
                 environment,
                 dataSourceProvider.getDataSource(),
-                properties,
-                applicationContext);
+                properties);
         preLiquibase.execute();
         return preLiquibase;
     }
@@ -206,14 +210,13 @@ public class PreLiquibaseAutoConfiguration {
             // This is important as we do not want the SpringLiquibase's 
             // afterPropertiesSet method to kick in. All we are interested in 
             // is to figure out which datasource Liquibase would be using.
-            LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration
+            final LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration
                     = new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
-            SpringLiquibase liquibase = liquibaseConfiguration.liquibase(
-                    dataSource, liquibaseDataSource);
+            final SpringLiquibase liquibase = liquibaseConfiguration.liquibase(dataSource, liquibaseDataSource);
 
             // Sanity check
-            Objects.requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");
-            this.dataSourceToUse = liquibase.getDataSource();
+            requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");
+            dataSourceToUse = liquibase.getDataSource();
         }
 
         @Override

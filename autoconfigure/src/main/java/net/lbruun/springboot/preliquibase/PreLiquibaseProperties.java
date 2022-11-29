@@ -15,30 +15,43 @@
  */
 package net.lbruun.springboot.preliquibase;
 
-import jakarta.validation.constraints.NotEmpty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNullElseGet;
+import static java.util.stream.Collectors.toList;
+import static net.lbruun.springboot.preliquibase.utils.LiquibaseUtils.getLiquibaseDatabaseShortName;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import static net.lbruun.springboot.preliquibase.PreLiquibaseProperties.PROPERTIES_PREFIX;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+
+import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptRefError;
 
 /**
  * Properties for Pre-Liquibase module.
  *
  * @author lbruun
  */
-@Validated
-@ConfigurationProperties(prefix = PROPERTIES_PREFIX)
+@ConfigurationProperties(prefix = "preliquibase")
 public class PreLiquibaseProperties {
 
-    public static final String PROPERTIES_PREFIX = "preliquibase";
-    public static final String DEFAULT_SCRIPT_LOCATION
-            = "classpath:preliquibase/";
-
+    @Autowired
+    private ResourceLoader resourceLoader;
+    private DataSource dataSource;
     private boolean enabled = true;
 
     /**
@@ -50,8 +63,7 @@ public class PreLiquibaseProperties {
     /**
      * SQL script resource references.
      */
-    @NotEmpty(message = "sqlScriptReferences must not be empty")
-    private List<String> sqlScriptReferences = Collections.singletonList(DEFAULT_SCRIPT_LOCATION);
+    private List<Resource> sqlScriptReferences;
 
     /**
      * Whether to stop if an error occurs while executing the SQL script.
@@ -66,8 +78,7 @@ public class PreLiquibaseProperties {
     /**
      * SQL scripts encoding.
      */
-    private Charset sqlScriptEncoding = StandardCharsets.UTF_8;
-
+    private Charset sqlScriptEncoding = UTF_8;
 
     /**
      * Get the 'enabled' setting (if the module is enabled or not).
@@ -88,16 +99,14 @@ public class PreLiquibaseProperties {
         this.enabled = enabled;
     }
 
-
     /**
      * Gets 'continueOnError' setting.
      *
      * @see #setContinueOnError(boolean)
      */
     public boolean isContinueOnError() {
-        return this.continueOnError;
+        return continueOnError;
     }
-
 
     /**
      * Sets whether to stop if an error occurs while executing the SQL script.
@@ -107,14 +116,13 @@ public class PreLiquibaseProperties {
         this.continueOnError = continueOnError;
     }
 
-
     /**
      * Gets 'separator' setting.
      *
      * @see #setSeparator(java.lang.String)
      */
     public String getSeparator() {
-        return this.separator;
+        return separator;
     }
 
     /**
@@ -132,7 +140,7 @@ public class PreLiquibaseProperties {
      * @see #setSqlScriptEncoding(java.nio.charset.Charset)
      */
     public Charset getSqlScriptEncoding() {
-        return this.sqlScriptEncoding;
+        return sqlScriptEncoding;
     }
 
     /**
@@ -155,7 +163,7 @@ public class PreLiquibaseProperties {
      * @see #setDbPlatformCode(java.lang.String)
      */
     public String getDbPlatformCode() {
-        return dbPlatformCode;
+        return requireNonNullElseGet(dbPlatformCode, () -> getLiquibaseDatabaseShortName(dataSource));
     }
 
     /**
@@ -178,10 +186,40 @@ public class PreLiquibaseProperties {
      * @return
      * @see #setSqlScriptReferences(java.util.List)
      */
-    public List<String> getSqlScriptReferences() {
-        return sqlScriptReferences;
+    public List<Resource> getSqlScriptReferences() {
+        return requireNonNullElseGet(sqlScriptReferences,
+                () -> List.of(resourceLoader.getResource("classpath:preliquibase")));
     }
 
+    private final Predicate<Resource> targetFile = res -> {
+        try {
+            return isNull(res.getFile().listFiles());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    };
+
+    private final Predicate<Resource> targetDirectory = res -> {
+        try {
+            return nonNull(res.getFile().listFiles());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    };
+
+    private final Function<Resource, List<Resource>> loadFiles = res -> {
+        try {
+            return List.of(res.getFile().listFiles()).stream().map(File::toURI).map(URI::toString)
+                    .map(resourceLoader::getResource).collect(toList());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return List.of();
+    };
+
+    // @formatter:off
     /**
      * Sets location(s) of where to find the SQL script(s) to execute.
      *
@@ -221,7 +259,41 @@ public class PreLiquibaseProperties {
      *
      * @param sqlScriptReferences list of Spring Resource references.
      */
-    public void setSqlScriptReferences(List<String> sqlScriptReferences) {
+    // @formatter:on
+    public void setSqlScriptReferences(List<Resource> sqlScriptReferences) {
         this.sqlScriptReferences = sqlScriptReferences;
+    }
+
+    public List<Resource> getScripts() {
+        final List<Resource> files = getSqlScriptReferences().stream().filter(targetFile).collect(toList());
+
+        final List<Resource> directories = getSqlScriptReferences().stream().filter(targetDirectory).map(loadFiles)
+                .flatMap(List::stream).collect(toList());
+
+        final String platformCode = getDbPlatformCode();
+
+        sqlScriptReferences = Stream.concat(files.stream(), directories.stream())
+                .filter(res -> res.getFilename().contains(platformCode)).collect(toList());
+
+        if (nonNull(getSqlScriptReferences())) {
+            getSqlScriptReferences().stream().filter(r -> !r.exists()).findFirst().ifPresent(r -> {
+                throw new SqlScriptRefError(format("Resource \"%s\" is invalid or cannot be found", r));
+            });
+            return getSqlScriptReferences();
+        }
+
+        final Resource typedFallback = resourceLoader
+                .getResource(format("classpath:preliquibase/%s.sql", getDbPlatformCode()));
+        final Resource defaultFallback = resourceLoader.getResource("classpath:preliquibase/default.sql");
+
+        return List.of(typedFallback.exists() ? typedFallback : defaultFallback);
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public DataSource getDatasource() {
+        return dataSource;
     }
 }
