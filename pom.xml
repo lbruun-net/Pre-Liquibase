@@ -26,7 +26,7 @@ limitations under the License.
         <module>examples/example1</module>
         <module>examples/example2</module>
     </modules>
-    <name>Spring Boot AutoConfiguration :: Pre-Liquibase Parent</name>
+    <name>Spring Boot AutoConfiguration :: Pre-Liquibase :: Parent</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
