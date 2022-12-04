@@ -22,7 +22,6 @@ import liquibase.exception.DatabaseException;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -32,10 +31,8 @@ import java.sql.SQLException;
  */
 public class LiquibaseUtils {
 
-
     private LiquibaseUtils() {
     }
-
 
     /**
      * Finds the Liquibase database {@code shortname} for a DataSource.
@@ -76,22 +73,22 @@ public class LiquibaseUtils {
      * connection used to determine the database type is closed again before the
      * method exits.
      *
+     * <p>
+     * Note that this is a fairly heavy operation as it involves a round-trip to the
+     * database. As the information does not change it is best to use this method
+     * only once and then cache the result.
+     *
      * @param dataSource input
      * @return Liquibase database shortname, always lower case, never null;
      * @throws PreLiquibaseException.ResolveDbPlatformError on all kinds of errors
      */
     public static String getLiquibaseDatabaseShortName(DataSource dataSource) {
-        Connection connection = null;
-        Database database = null;
-
-        // This gets convoluted and looks like Java 1.4 code. Ugly.
-        // Mainly because the Liquibase classes do not support AutoCloseable.
-
-        // See SpringLiquibase.getDatabaseProductName() method from where
-        // this code is pretty much copied.
-        try {
-            connection = dataSource.getConnection();
-            database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+        // Credit https://github.com/zorglube for having the Liquibase project add Autocloseable interface
+        // to their Database and JdbcConnection classes and for proposing simplification in this method.
+        try (
+                JdbcConnection jdbcConnection = new JdbcConnection(dataSource.getConnection());
+                Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection)
+        ) {
             return database.getShortName();
         } catch (SQLException ex1) {
             throw new PreLiquibaseException.ResolveDbPlatformError("Could not acquire connection for DataSource", ex1);
@@ -99,26 +96,6 @@ public class LiquibaseUtils {
             throw new PreLiquibaseException.ResolveDbPlatformError("Error while finding Liquibase Database implementation for DataSource", ex2);
         } catch (Exception ex3) {
             throw new PreLiquibaseException.ResolveDbPlatformError("Unexpected error while finding Liquibase Database implementation for DataSource", ex3);
-        } finally {
-            if (database != null) {
-                try {
-                    database.close(); // will also close underlying JDBC connection
-                } catch (DatabaseException ex) {
-                    throw new PreLiquibaseException.ResolveDbPlatformError("Error while closing connection for DataSource", ex);
-                }
-            } else if (connection != null) {
-                try {
-                    if (!connection.isClosed()) {
-                        if (!connection.getAutoCommit()) {
-                            connection.rollback();
-                        }
-                        connection.close();
-                    }
-                } catch (SQLException ex) {
-                    throw new PreLiquibaseException.ResolveDbPlatformError("Error while closing connection for DataSource", ex);
-                }
-            }
         }
     }
-
 }
