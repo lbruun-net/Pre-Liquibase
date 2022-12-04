@@ -31,10 +31,8 @@ import java.sql.SQLException;
  */
 public class LiquibaseUtils {
 
-
     private LiquibaseUtils() {
     }
-
 
     /**
      * Finds the Liquibase database {@code shortname} for a DataSource.
@@ -95,5 +93,4 @@ public class LiquibaseUtils {
             throw new PreLiquibaseException.ResolveDbPlatformError("Unexpected error while finding Liquibase Database implementation for DataSource", ex3);
         }
     }
-
 }
