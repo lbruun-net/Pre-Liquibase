@@ -271,7 +271,7 @@ You should work on that first and only use this setting as a last resort.
 - link:examples/example2/[Example 2]. Using Pre-Liquibase with multiple datasources. This requires configuring
   beans yourself, not just for Pre-Liquibase but also for Liquibase, JPA/Hibernate and so on. The
   example application shows how to do this. (in many ways it is a show-case application for how to
-  to use multiple datasources in general in a Spring Boot application; the Pre-Liquibase part of it is trivial)
+  use multiple datasources in general in a Spring Boot application; the Pre-Liquibase part of it is trivial)
 
 
 == Additional notes
@@ -402,7 +402,7 @@ You can in theory use Spring Boot's DataSource initialization feature or JPA DDL
 https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.using-basic-sql-scripts[here], 
 but the Spring Boot guide clearly explains that you should not use such methods along side "a higher-level Database Migration Tool, 
 like Flyway or Liquibase" because these methods are not guaranteed to execute before Liquibase and if they happen to do so 
-at the moment they might not in the future. In constrast the Pre-Liquibase module is designed specifically 
+at the moment, they might not in the future. In constrast the Pre-Liquibase module is designed specifically
 for use with Liquibase and is guaranteed to _always_ execute before Liquibase itself.
 
 
