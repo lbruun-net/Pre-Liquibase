@@ -73,6 +73,11 @@ public class LiquibaseUtils {
      * connection used to determine the database type is closed again before the
      * method exits.
      *
+     * <p>
+     * Note that this is a fairly heavy operation as it involves a round-trip to the
+     * database. As the information does not change it is best to use this method
+     * only once and then cache the result.
+     *
      * @param dataSource input
      * @return Liquibase database shortname, always lower case, never null;
      * @throws PreLiquibaseException.ResolveDbPlatformError on all kinds of errors
