@@ -29,6 +29,7 @@ import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseConnectionDetails;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -69,11 +70,12 @@ public class PreLiquibaseAutoConfiguration {
             LiquibaseProperties liquibaseProperties,
             DataSourceProperties dataSourceProperties,
             ObjectProvider<DataSource> dataSource,
-            @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource) {
+            @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
+            LiquibaseConnectionDetails connectionDetails) {
         logger.debug("Instantiation of PreLiquibaseDataSourceProvider");
 
         return new DefaultPreLiquibaseDataSourceProvider(
-                liquibaseProperties, dataSourceProperties, dataSource, liquibaseDataSource);
+                liquibaseProperties, dataSourceProperties, dataSource, liquibaseDataSource, connectionDetails);
     }
 
     /**
@@ -195,7 +197,8 @@ public class PreLiquibaseAutoConfiguration {
                 @NonNull LiquibaseProperties liquibaseProperties,
                 @NonNull DataSourceProperties dataSourceProperties,
                 @NonNull ObjectProvider<DataSource> dataSource,
-                @NonNull ObjectProvider<DataSource> liquibaseDataSource) {
+                @NonNull ObjectProvider<DataSource> liquibaseDataSource,
+                @NonNull LiquibaseConnectionDetails connectionDetails) {
 
             // Here we re-use Spring Boot's own LiquibaseAutoConfiguration
             // so that we figure out which DataSource will (later) be used
@@ -207,9 +210,9 @@ public class PreLiquibaseAutoConfiguration {
             // afterPropertiesSet method to kick in. All we are interested in 
             // is to figure out which datasource Liquibase would be using.
             LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration
-                    = new LiquibaseAutoConfiguration.LiquibaseConfiguration(liquibaseProperties);
+                    = new LiquibaseAutoConfiguration.LiquibaseConfiguration();
             SpringLiquibase liquibase = liquibaseConfiguration.liquibase(
-                    dataSource, liquibaseDataSource);
+                    dataSource, liquibaseDataSource, liquibaseProperties, connectionDetails);
 
             // Sanity check
             Objects.requireNonNull(liquibase.getDataSource(), "Unexpected: null value for DataSource returned from SpringLiquibase class");

@@ -33,7 +33,7 @@ limitations under the License.
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.scm.id>github.com-lbruun.net</project.scm.id>
-        <spring.boot.version>3.0.0</spring.boot.version>
+        <spring.boot.version>3.1.0</spring.boot.version>
     </properties>
 
     <url>https://github.com/lbruun/Pre-Liquibase</url>
