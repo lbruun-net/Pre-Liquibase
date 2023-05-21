@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.autoconfigure.jdbc.JdbcConnectionDetails;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseConnectionDetails;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
@@ -122,9 +123,8 @@ public class PreLiquibaseAutoConfiguration {
     }
 
     /**
-     * Condition that says that either at least one DataSource bean must exist
-     * or the user must have declared explicitly a JDBC URL for use with
-     * Liquibase.
+     * Condition that says that either at least one DataSource bean must exist, or a JdbcConnectionDetails bean must
+     * exist, or the user must have declared explicitly a JDBC URL for use with Liquibase.
      */
     static final class LiquibaseDataSourceCondition extends AnyNestedCondition {
 
@@ -134,6 +134,10 @@ public class PreLiquibaseAutoConfiguration {
 
         @ConditionalOnBean(DataSource.class)
         private static final class DataSourceBeanCondition {
+        }
+
+        @ConditionalOnBean(JdbcConnectionDetails.class)
+        private static final class JdbcConnectionDetailsCondition {
         }
 
         @ConditionalOnProperty(prefix = "spring.liquibase", name = "url", matchIfMissing = false)
