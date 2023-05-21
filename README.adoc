@@ -38,7 +38,7 @@ If not, you should pause and ask yourself if you are doing the right thing.
 The module requires 
 
 - Java 17 or later (artifacts before `1.3` only require Java 8 but do not support Spring Boot 3)
-- Spring Boot 3.0 or later (for older versions see <<Spring Boot compatibility>>)
+- Spring Boot 3.1 or later (for older versions see <<Spring Boot compatibility>>)
 
 {nbsp} +
 {nbsp} +
@@ -354,7 +354,7 @@ easily adapt to a single datasource use-case.
 
 == Spring Boot compatibility
 
-Current version works with Spring Boot 3.0+ and has been tested with version 3.0. There's no reason why it
+Current version works with Spring Boot 3.1+ and has been tested with version 3.1. There's no reason why it
 should not work with any future 3.x release of Spring Boot.
 
 
@@ -366,11 +366,17 @@ should not work with any future 3.x release of Spring Boot.
 |Git branch name
 |Description
 
-|1.3.x
-|Spring Boot 3.0
+|1.4.x
+|Spring Boot 3.1
 |JDK 17
 |`master`
 |Use this unless you absolutely *must* use an older version of Spring Boot.
+
+|1.3.x
+|Spring Boot 3.0
+|JDK 17
+|
+|No longer maintained
 
 |1.2.x
 |Spring Boot 2.6 and 2.7
