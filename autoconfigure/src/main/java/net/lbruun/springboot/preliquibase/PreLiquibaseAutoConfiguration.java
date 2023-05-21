@@ -143,10 +143,11 @@ public class PreLiquibaseAutoConfiguration {
 
     /**
      * Condition that says that both of the properties
-     * <p>
-     * 'preliquibase.enabled' 'spring.liquibase.enabled'
-     * <p>
-     * must not have a value of "false"Â´or the property must be absent.
+     * <pre>
+     * preliquibase.enabled
+     * spring.liquibase.enabled
+     * </pre>
+     * must not have a value of {@code false} or the property must be absent.
      */
     static final class EnabledCondition extends AllNestedConditions {
 
@@ -179,19 +180,16 @@ public class PreLiquibaseAutoConfiguration {
         private final DataSource dataSourceToUse;
 
         /**
-         * Determine DataSource (based on input) which Liquibase itself is
-         * using.
+         * Determine DataSource (based on input) which Liquibase itself is using.
          *
-         * @param liquibaseProperties  Spring Boot properties for Liquibase
-         *                             ("spring.liquibase")
-         * @param dataSourceProperties Spring Boot properties for DataSource
-         *                             ("spring.datasource")
+         * @param liquibaseProperties  Spring Boot properties for Liquibase ("spring.liquibase")
+         * @param dataSourceProperties Spring Boot properties for DataSource ("spring.datasource")
          * @param dataSource           general DataSource (if any)
-         * @param liquibaseDataSource  designated DataSource for Liquibase (if
-         *                             any). This is typically a DataSource which has been annotated with
-         *                             {@code @LiquibaseDataSource} in order to mark it as designated for
-         *                             Liquibase. If this DataSource exists it will be used in preference to
-         *                             a DataSource in {@code dataSource} parameter.
+         * @param liquibaseDataSource  designated DataSource for Liquibase (if any). This is typically a DataSource
+         *                             which has been annotated with {@code @LiquibaseDataSource} in order to mark it as
+         *                             designated for Liquibase. If this DataSource exists it will be used in preference
+         *                             to a DataSource in {@code dataSource} parameter.
+         * @param connectionDetails
          */
         public DefaultPreLiquibaseDataSourceProvider(
                 @NonNull LiquibaseProperties liquibaseProperties,
@@ -205,7 +203,7 @@ public class PreLiquibaseAutoConfiguration {
             // by LiquibaseAutoConfiguration. This ensures that we use the same
             // logic for figuring out which DataSource to use.
             // Note that SpringLiquibase object below gets instantiated OUTSIDE
-            // of the IoC container, meaning it is just normal "new" instantiaion.
+            // of the IoC container, meaning it is just normal "new" instantiation.
             // This is important as we do not want the SpringLiquibase's 
             // afterPropertiesSet method to kick in. All we are interested in 
             // is to figure out which datasource Liquibase would be using.
