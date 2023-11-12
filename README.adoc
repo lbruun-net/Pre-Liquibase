@@ -22,8 +22,8 @@ Companion to https://docs.spring.io/spring-boot/docs/current/reference/html/howt
 which allows to execute some SQL script file _prior_ to executing https://www.liquibase.org/[Liquibase] ChangeSets.
 
 Why? While you should be using Liquibase for all your DDL there's a bit of a chicken-and-egg problem: 
-The database and schema where Liquibase puts itself into obviously cannot be created by Liquibase itself. 
-This module solves this problem by allowing you to "deploy" such DB prerequisities as part of your application code.
+The database and schema where Liquibase puts itself into obviously cannot be created by Liquibase itself.
+This module solves this problem by allowing you to "deploy" such DB prerequisites as part of your application code.
 Typical use is to create database schema or database catalog so that Liquibase objects have "a home" where
 they can live.
 
@@ -31,7 +31,7 @@ they can live.
 as the SQL script you want executed prior to Liquibase execution. There is no Java code for you to add to your project.
 
 WARNING: Whatever you put in your SQL script file(s) for this module should be something which Liquibase cannot handle.
-(example: creating a schema for Liquibase's own use). You are using Liqiubase for a reason so you should have _all_ of 
+(example: creating a schema for Liquibase's own use). You are using Liquibase for a reason so you should have _all_ of
 your table model initialization in Liquibase ChangeSets. Most likely your SQL file for this module will be a one-liner. 
 If not, you should pause and ask yourself if you are doing the right thing.
 
@@ -54,6 +54,7 @@ you want each environment to use its own schema or own catalog. This is an inexp
 way of hosting multiple "editions" of your application on the same database server, for example your
 'dev1, 'dev2', 'uat' and 'sit' environments can all use the same database user without clashing
 with each other.
+- You want to isolate tests from each other.
 - Anything you can think of (but be sure not to use the module for something which Liquibase itself
   should rightfully do)
 
@@ -107,7 +108,7 @@ trigger its own auto-configuration if you also have Liquibase in your classpath.
 sure it always fires _before_ Liquibase itself. The module has no effect if you add it to
 a Spring Boot project which does not use Liquibase.
 
-The module will search for SQL script files in pre-defined locations and execute those. You can have seperate SQL scripts 
+The module will search for SQL script files in pre-defined locations and execute those. You can have separate SQL scripts
 for various database platforms (for example one for PostgreSQL and another for MS SQL Server, etc). At runtime the type of
 database will be auto-detected so that the right SQL script is executed.
 
@@ -143,7 +144,8 @@ Rules for the file are:
 - Comment lines start with `--`.
 - Replacement variables on the form `${propertyName}` or `${propertyName:defaultValue}` can appear
   anywhere in the file so as to make your SQL script file dynamic. The property will be resolved from 
-  your application's Spring Environment.
+  your application's Spring Environment. Replacement is done indiscriminately: it doesn't matter if the replacement
+  variable is inside quotes; it will still be replaced.
 - The script should be idempotent code (only-create-if-not-already-exists statements), execute quickly 
   and generally be without side effects. Remember that the SQL script will be executed _every_ time 
   your application starts. Also, unlike Liquibase itself, Pre-Liquibase does not have a mechanism
@@ -265,6 +267,67 @@ You should work on that first and only use this setting as a last resort.
 
 |===
 
+
+=== Spring Boot tests
+
+You can use Spring Boot's `@DataJpaTest` annotation as you normally would because the Pre-Liquibase module
+registers itself as one of the auto-configs which are in-scope when this annotation is applied to a test class.
+
+The link:examples/example1/[example project] showcases this.
+
+
+=== Pre-Liquibase used for test isolation
+
+Performing integration tests against a database is best done using a fresh ephemeral database _for each test_.
+For example, by using https://testcontainers.com/[TestContainers]. However, this is not always possible. For example
+if the CI pipeline is already executing inside Docker. Looking at you GitLab. In such case you'll likely have only one
+ephemeral database for all of the pipeline execution. This creates a problem of *test isolation*. Pre-Liquibase
+is perfect for this use-case as you can use it to create database schemas on-the-fly.
+
+Here is how:
+
+. Add the Pre-Liquibase dependency to your project. If you only use Pre-Liquibase for testing, then:
+
+[source,xml]
+----
+<dependency>
+    <groupId>net.lbruun.springboot</groupId>
+    <artifactId>preliquibase-spring-boot-starter</artifactId>
+    <version>  ---latest-version---  </version>
+    <scope>test</scope>
+</dependency>
+----
+
+[start=2]
+. Add SQL file(s) to folder `src/test/resources/preliquibase/`, for example file `postgresql.sql`:
+
+[source,text]
+----
+CREATE SCHEMA IF NOT EXISTS ${spring.liquibase.default-schema};
+----
+
+[start=3]
+. Annotate your Spring Boot tests with `@TestPropertySource` so that you override the value for database
+schema name, like so:
+
+[source,java]
+----
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour, YMMV
+@DataJpaTest
+@TestPropertySource(properties = {
+    "spring.jpa.properties.hibernate.default_schema=mytest_382",
+    "spring.liquibase.default-schema=mytest_382"
+    })
+public class PersistenceTest {
+    ...
+}
+----
+
+As a result, `PersistenceTest` will execute in its own database schema, `mytest_382`, which is created on-the-fly by
+Pre-Liquibase. An additional benefit is that you can now perform testing in parallel: different tests will not interfere
+with each other even if they use the same database.
+
+
 === Examples
 
 - link:examples/example1/[Example 1]. Using Pre-Liquibase with a single datasource.
@@ -293,12 +356,13 @@ An example of this can be found in link:example2/[Example 2].
 
 === To quote or not to quote?
 You need to consider case (upper/lower) for the schema name. The SQL standard mandates that object names
-are treated case-insentive if the value is not quoted.
+are treated case-insensitive if the value is not quoted.
 
 However, there's a quirk in Liquibase. While Liquibase in general offers offers control over SQL object
 quoting behavior (by way of the `objectQuotingStrategy` attribute in your changelog) the same is not true
-in respect to Liquibase system tables, i.e. DATACHANGELOG and DATABASECHANGELOGLOCK. Here Liquibase will always
-use the strategy named `LEGACY`. This means that SQL objects will be quoted if they are of mixed case, otherwise not.
+in respect to Liquibase system tables, i.e. DATACHANGELOG and DATABASECHANGELOGLOCK and their associated
+schema name. Here Liquibase will always use the strategy named `LEGACY`. This means that SQL objects will be quoted
+if they are of mixed case, otherwise not.
 This may create unexpected results with regards to the name of the schema holding the Liquibase system tables.
 Therefore, the advice is to *_use either all lower-case or all upper-case for schema name, never mixed case_*.
 In short 'Foo_bar' is not a good value, but 'FOO_BAR' or 'foo_bar' is.
@@ -325,12 +389,6 @@ SQL script will have created a schema in the database server with name `foo_bar`
 error on Liquibase execution. Hence the recommendation to not use mixed-case for the schema name. Such strategy
 will work with any database platform.
 
-=== Unit testing
-
-You can use Spring Boot's `@DataJpaTest` annotation as you normally would because the Pre-Liquibase module 
-registers itself as one of the auto-configs which are in-scope when this annotation is applied to a test class.
-
-The link:examples/example1/[example project] showcases this.
 
 
 === Troubleshooting
