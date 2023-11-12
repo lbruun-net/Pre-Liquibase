@@ -1,5 +1,6 @@
 = Spring Boot Pre-Liquibase
 :toc:
+:toclevels: 3
 :toc-placement!:
 ifdef::env-github[]
 :tip-caption: :bulb:
