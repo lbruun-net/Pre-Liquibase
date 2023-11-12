@@ -270,19 +270,23 @@ You should work on that first and only use this setting as a last resort.
 
 === Spring Boot tests
 
+==== Spring Boot `@DataJpaTest` test slice
+
 You can use Spring Boot's `@DataJpaTest` annotation as you normally would because the Pre-Liquibase module
 registers itself as one of the auto-configs which are in-scope when this annotation is applied to a test class.
 
 The link:examples/example1/[example project] showcases this.
 
 
-=== Pre-Liquibase used for test isolation
+==== Pre-Liquibase used for test isolation
 
 Performing integration tests against a database is best done using a fresh ephemeral database _for each test_.
 For example, by using https://testcontainers.com/[TestContainers]. However, this is not always possible. For example
 if the CI pipeline is already executing inside Docker. Looking at you GitLab. In such case you'll likely have only one
-ephemeral database for all of the pipeline execution. This creates a problem of *test isolation*. Pre-Liquibase
-is perfect for this use-case as you can use it to create database schemas on-the-fly.
+ephemeral database for all of the pipeline execution. This creates a problem of *test isolation*.
+You can to some extend solve this problem by using the traditional Spring `@Sql` annotation to execute some SQL script
+before each test. But such script will not fire _before_ Liquibase.
+Pre-Liquibase is perfect for this use-case as you can use it to create database schemas on-the-fly.
 
 Here is how:
 
