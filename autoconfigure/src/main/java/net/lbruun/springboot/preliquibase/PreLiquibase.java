@@ -214,10 +214,10 @@ public class PreLiquibase {
      * Execute SQL sql scripts if required.
      *
      * @return {@code true} if the SQL script was attempted executed.
-     * @throws ScriptionException (or subclass) if a SQL script files cannot be read or there's
+     * @throws ScriptException (or subclass) if a SQL script file cannot be read or there's
      *                            a SQL execution error.
      */
-    private boolean executeSQLScripts() {
+    private boolean executeSQLScripts() throws ScriptException {
 
         if (!this.properties.isEnabled()) {
             logger.debug("Initialization disabled (not running SQL script)");
