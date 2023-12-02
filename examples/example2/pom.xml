@@ -92,6 +92,7 @@ limitations under the License.
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <!-- Embedded db. Used when no DataSource is configured -->
