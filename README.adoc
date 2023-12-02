@@ -417,7 +417,7 @@ easily adapt to a single datasource use-case.
 
 == Spring Boot compatibility
 
-Current version works with Spring Boot 3.1+ and has been tested with version 3.1. There's no reason why it
+Current version works with Spring Boot 3.1+ and has been tested with version 3.1 and 3.2. There's no reason why it
 should not work with any future 3.x release of Spring Boot.
 
 
@@ -429,11 +429,17 @@ should not work with any future 3.x release of Spring Boot.
 |Git branch name
 |Description
 
+|1.5.x
+|Spring Boot 3.2
+|JDK 17
+|`master`
+|Use this unless you absolutely *must* use an older version of Spring Boot.
+
 |1.4.x
 |Spring Boot 3.1
 |JDK 17
 |`master`
-|Use this unless you absolutely *must* use an older version of Spring Boot.
+|Still maintained
 
 |1.3.x
 |Spring Boot 3.0
