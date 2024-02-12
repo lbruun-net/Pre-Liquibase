@@ -1,5 +1,3 @@
-
-
 # Ignore Maven stuff
 target/
 pom.xml.tag
@@ -31,4 +29,3 @@ buildNumber.properties
 nbproject/
 nbactions.xml
 nb-configuration.xml
-

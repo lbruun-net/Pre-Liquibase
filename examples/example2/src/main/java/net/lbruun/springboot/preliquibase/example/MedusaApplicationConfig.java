@@ -102,7 +102,7 @@ public class MedusaApplicationConfig {
       @Bean
       @ConfigurationProperties("persistence.datasource.db1")
       public DataSourceProperties db1DataSourceProperties() {
-        final Class<?>[] name = {String.class}; // TODO check if useful
+        final Class<?>[] name = new Class<?>[]{String.class}; // TODO check if useful
         return new DataSourceProperties();
       }
 
@@ -123,9 +123,9 @@ public class MedusaApplicationConfig {
       public PreLiquibase db1PreLiquibase(
           @Qualifier("db1DataSource") DataSource dataSource,
           Environment environment,
-          @Qualifier("db1PreLiquibaseProperties") PreLiquibaseProperties properties) {
+          @Qualifier("db1PreLiquibaseProperties") PreLiquibaseProperties properties, ApplicationContext applicationContext) {
 
-        final PreLiquibase preLiquibase = new PreLiquibase(environment, dataSource, properties);
+        final PreLiquibase preLiquibase = new PreLiquibase(environment, dataSource, properties, applicationContext);
         preLiquibase.execute();
         return preLiquibase;
       }
@@ -200,9 +200,10 @@ public class MedusaApplicationConfig {
       public PreLiquibase db2PreLiquibase(
           @Qualifier("db2DataSource") DataSource dataSource,
           Environment environment,
-          @Qualifier("db2PreLiquibaseProperties") PreLiquibaseProperties properties) {
+          @Qualifier("db2PreLiquibaseProperties") PreLiquibaseProperties properties,
+          ApplicationContext applicationContext) {
 
-        final PreLiquibase preLiquibase = new PreLiquibase(environment, dataSource, properties);
+        final PreLiquibase preLiquibase = new PreLiquibase(environment, dataSource, properties, applicationContext);
         preLiquibase.execute();
         return preLiquibase;
       }
