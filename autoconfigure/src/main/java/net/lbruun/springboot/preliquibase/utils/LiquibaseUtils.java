@@ -1,31 +1,25 @@
 /*
  * Copyright 2021 lbruun.net.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package net.lbruun.springboot.preliquibase.utils;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-
 import javax.sql.DataSource;
-
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException;
-import net.lbruun.springboot.preliquibase.PreLiquibaseException.ResolveDbPlatformError;
 
 /**
  * Utility methods for Liquibase
@@ -34,10 +28,9 @@ import net.lbruun.springboot.preliquibase.PreLiquibaseException.ResolveDbPlatfor
  */
 public class LiquibaseUtils {
 
-    private LiquibaseUtils() {
-    }
+  private LiquibaseUtils() {}
 
-    // @formatter:off
+  // @formatter:off
     /**
      * Finds the Liquibase database {@code shortname} for a DataSource.
      *
@@ -82,20 +75,23 @@ public class LiquibaseUtils {
      * @throws PreLiquibaseException.ResolveDbPlatformError on all kinds of errors
      */
     // @formatter:on
-    public static String getLiquibaseDatabaseShortName(DataSource dataSource) {
-        // See SpringLiquibase.getDatabaseProductName() method from where
-        // this code is pretty much copied.
-        try (
-              final Connection connection = dataSource.getConnection();
-              Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            ) {
-            return database.getShortName();
-        } catch (final SQLException ex1) {
-            throw new ResolveDbPlatformError("Could not acquire connection for DataSource", ex1);
-        } catch (final DatabaseException ex2) {
-            throw new ResolveDbPlatformError("Error while finding Liquibase Database implementation for DataSource", ex2);
-        } catch (final Exception ex3) {
-            throw new ResolveDbPlatformError("Unexpected error while finding Liquibase Database implementation for DataSource", ex3);
-        }
+  public static String getLiquibaseDatabaseShortName(DataSource dataSource) {
+    // Credit https://github.com/zorglube for having the Liquibase project add Autocloseable
+    // interface
+    // to their Database and JdbcConnection classes and for proposing simplification in this method.
+    try (JdbcConnection jdbcConnection = new JdbcConnection(dataSource.getConnection());
+        Database database =
+            DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection)) {
+      return database.getShortName();
+    } catch (SQLException ex1) {
+      throw new PreLiquibaseException.ResolveDbPlatformError(
+          "Could not acquire connection for DataSource", ex1);
+    } catch (DatabaseException ex2) {
+      throw new PreLiquibaseException.ResolveDbPlatformError(
+          "Error while finding Liquibase Database implementation for DataSource", ex2);
+    } catch (Exception ex3) {
+      throw new PreLiquibaseException.ResolveDbPlatformError(
+          "Unexpected error while finding Liquibase Database implementation for DataSource", ex3);
     }
+  }
 }
