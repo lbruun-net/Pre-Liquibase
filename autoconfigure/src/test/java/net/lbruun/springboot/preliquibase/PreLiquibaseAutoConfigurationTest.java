@@ -127,11 +127,11 @@ public class PreLiquibaseAutoConfigurationTest {
 
     }
 
-	@Test
-	void sqlScriptsInCustomLocation() {
+    @Test
+    void sqlScriptsInCustomLocation() {
 
-		this.contextRunner
-			.withUserConfiguration(EmbeddedDataSourceConfiguration.class)
+        this.contextRunner
+            .withUserConfiguration(EmbeddedDataSourceConfiguration.class)
             .withPropertyValues(
                     "spring.datasource.url = " + JDBC_URL1,
                     "preliquibase.sql-script-references = file:src/test/resources/preliquibase-customlocation/hsqldb.sql,file:src/test/resources/preliquibase-customlocation/default.sql",
@@ -152,64 +152,64 @@ public class PreLiquibaseAutoConfigurationTest {
                 assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase-customlocation/hsqldb.sql");
 
             }));
-	}
+    }
 
-	// Utility methods
+    // Utility methods
 
-	private ContextConsumer<AssertableApplicationContext> assertPreLiquibase(
-			Consumer<PreLiquibase> consumer) {
-		return context -> {
-			assertThat(context).hasSingleBean(PreLiquibase.class);
-			PreLiquibase preLiquibase = context.getBean(PreLiquibase.class);
-			consumer.accept(preLiquibase);
-		};
-	}
+    private ContextConsumer<AssertableApplicationContext> assertPreLiquibase(
+            Consumer<PreLiquibase> consumer) {
+        return context -> {
+            assertThat(context).hasSingleBean(PreLiquibase.class);
+            PreLiquibase preLiquibase = context.getBean(PreLiquibase.class);
+            consumer.accept(preLiquibase);
+        };
+    }
 
-	private String getScriptFileName(PreLiquibase preLiquibase, int scriptNo) {
+    private String getScriptFileName(PreLiquibase preLiquibase, int scriptNo) {
 
-		List<Resource> unfilteredResources = preLiquibase.getUnfilteredResources();
-		if (unfilteredResources == null || unfilteredResources.size() - 1 < scriptNo) {
-			throw new RuntimeException("No such scriptNo");
-		}
-		Resource res = unfilteredResources.get(scriptNo);
+        List<Resource> unfilteredResources = preLiquibase.getUnfilteredResources();
+        if (unfilteredResources == null || unfilteredResources.size() - 1 < scriptNo) {
+            throw new RuntimeException("No such scriptNo");
+        }
+        Resource res = unfilteredResources.get(scriptNo);
 
-		try {
-			return res.getURL().getPath();
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+        try {
+            return res.getURL().getPath();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class LiquibaseDataSourceConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    static class LiquibaseDataSourceConfiguration {
 
-		@Bean
-		@Primary
-		DataSource normalDataSource() {
-			return DataSourceBuilder.create().url("jdbc:hsqldb:mem:normal").username("sa").build();
-		}
+        @Bean
+        @Primary
+        DataSource normalDataSource() {
+            return DataSourceBuilder.create().url("jdbc:hsqldb:mem:normal").username("sa").build();
+        }
 
-		@LiquibaseDataSource
-		@Bean
-		DataSource liquibaseDataSource() {
-			return DataSourceBuilder.create().url("jdbc:hsqldb:mem:liquibasetest").username("sa").build();
-		}
+        @LiquibaseDataSource
+        @Bean
+        DataSource liquibaseDataSource() {
+            return DataSourceBuilder.create().url("jdbc:hsqldb:mem:liquibasetest").username("sa").build();
+        }
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableConfigurationProperties({PreLiquibaseProperties.class})
-	static class PreLiquibaseUserConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @EnableConfigurationProperties({PreLiquibaseProperties.class})
+    static class PreLiquibaseUserConfiguration {
 
-		@Bean
-		PreLiquibase customPreLiquibase(
-				Environment environment,
-				PreLiquibaseProperties properties) {
-			
-			return new PreLiquibase(
-					environment,
-					DataSourceBuilder.create().url(JDBC_URL1).build(),
-					properties);
-		}
-	}
+        @Bean
+        PreLiquibase customPreLiquibase(
+                Environment environment,
+                PreLiquibaseProperties properties) {
+
+            return new PreLiquibase(
+                    environment,
+                    DataSourceBuilder.create().url(JDBC_URL1).build(),
+                    properties);
+        }
+    }
 }

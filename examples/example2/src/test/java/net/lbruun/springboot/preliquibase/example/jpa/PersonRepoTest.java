@@ -36,25 +36,25 @@ import net.lbruun.springboot.preliquibase.example.jpa.db1.PersonRepo;
     "preliquibase.sql-script-references=classpath:preliquibase/db1/"})
 public class PersonRepoTest {
 
-  @Autowired
-  private PersonRepo personRepo;
+    @Autowired
+    private PersonRepo personRepo;
 
-  @Test
-  void injectedComponentsAreNotNull() {
-    assertThat(personRepo).isNotNull();
-  }
+    @Test
+    void injectedComponentsAreNotNull() {
+        assertThat(personRepo).isNotNull();
+    }
 
-  @Test
-  void saveAndRetrievePerson() {
+    @Test
+    void saveAndRetrievePerson() {
 
-    Person person = new Person();
-    person.setFirstName("John");
-    person.setLastName("Doe");
-    person.setBirthDate(LocalDate.of(1996, 12, 4));
-    personRepo.save(person);
+        Person person = new Person();
+        person.setFirstName("John");
+        person.setLastName("Doe");
+        person.setBirthDate(LocalDate.of(1996, 12, 4));
+        personRepo.save(person);
 
-    // See if we can find the person we just saved
-    Optional<Person> personOpt = personRepo.findById(person.getPersonId());
-    assertThat(personOpt).isNotEmpty();
-  }
+        // See if we can find the person we just saved
+        Optional<Person> personOpt = personRepo.findById(person.getPersonId());
+        assertThat(personOpt).isNotEmpty();
+    }
 }

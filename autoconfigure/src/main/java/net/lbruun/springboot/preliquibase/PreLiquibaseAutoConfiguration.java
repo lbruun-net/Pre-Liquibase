@@ -71,33 +71,35 @@ public class PreLiquibaseAutoConfiguration {
     @ConditionalOnMissingBean({PreLiquibaseDataSourceProvider.class})
     @Bean
     PreLiquibaseDataSourceProvider preLiquibaseDataSourceProvider(
-        LiquibaseProperties liquibaseProperties, DataSourceProperties dataSourceProperties,
-        ObjectProvider<DataSource> dataSource,
-        @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
-        LiquibaseConnectionDetails connectionDetails) {
-          logger.debug("Instantiation of PreLiquibaseDataSourceProvider");
+            LiquibaseProperties liquibaseProperties,
+            DataSourceProperties dataSourceProperties,
+            ObjectProvider<DataSource> dataSource,
+            @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
+            LiquibaseConnectionDetails connectionDetails) {
+        logger.debug("Instantiation of PreLiquibaseDataSourceProvider");
 
-          return new DefaultPreLiquibaseDataSourceProvider(
-              liquibaseProperties, dataSourceProperties, dataSource, liquibaseDataSource, connectionDetails);
+        return new DefaultPreLiquibaseDataSourceProvider(
+                liquibaseProperties, dataSourceProperties, dataSource, liquibaseDataSource, connectionDetails);
     }
 
     /**
-     * Create and executes PreLiquibase bean. The returned object is initialized, meaning
-     * {@link PreLiquibase#execute() execute()} has been invoked.
+     * Create and executes PreLiquibase bean. The returned object is
+     * initialized, meaning {@link PreLiquibase#execute() execute()} has been
+     * invoked.
      */
     @Bean
     PreLiquibase preLiquibase(
-    		Environment environment,
-    		PreLiquibaseProperties properties,
-    		PreLiquibaseDataSourceProvider dataSourceProvider) {
-    	logger.debug("Instantiation of PreLiquibase");
+            Environment environment,
+            PreLiquibaseProperties properties,
+            PreLiquibaseDataSourceProvider dataSourceProvider) {
+        logger.debug("Instantiation of PreLiquibase");
 
-    	PreLiquibase preLiquibase = new PreLiquibase(
-    			environment,
-    			dataSourceProvider.getDataSource(),
-    			properties);
-    	preLiquibase.execute();
-    	return preLiquibase;
+        PreLiquibase preLiquibase = new PreLiquibase(
+                environment,
+                dataSourceProvider.getDataSource(),
+                properties);
+        preLiquibase.execute();
+        return preLiquibase;
     }
 
     /**
@@ -113,12 +115,12 @@ public class PreLiquibaseAutoConfiguration {
     static class LiquibaseOnPreLiquibaseDependencyPostProcessor
             extends AbstractDependsOnBeanFactoryPostProcessor {
 
-    	private static final Logger logger = LoggerFactory.getLogger(LiquibaseOnPreLiquibaseDependencyPostProcessor.class);
+        private static final Logger logger = LoggerFactory.getLogger(LiquibaseOnPreLiquibaseDependencyPostProcessor.class);
 
-    	LiquibaseOnPreLiquibaseDependencyPostProcessor() {
-    		super(SpringLiquibase.class, PreLiquibase.class);
-    		logger.debug("Downstream dependencies on PreLiquibase are now configured");
-    	}
+        LiquibaseOnPreLiquibaseDependencyPostProcessor() {
+            super(SpringLiquibase.class, PreLiquibase.class);
+            logger.debug("Downstream dependencies on PreLiquibase are now configured");
+        }
     }
 
     /**

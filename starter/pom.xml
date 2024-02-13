@@ -25,7 +25,7 @@ limitations under the License.
 
     <artifactId>preliquibase-spring-boot-starter</artifactId>
     <packaging>jar</packaging>
-    <name>Spring Boot AutoConfiguration :: Pre-Liquibase :: Starter</name>
+    <name>Spring Boot AutoConfiguration :: Pre-Liquibase Starter</name>
 
     <description>Bootstrapping for Pre-Liquibase</description>
 
@@ -40,7 +40,7 @@ limitations under the License.
             <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
         </dependency>
     </dependencies>
- 
+
     <build>
         <plugins>
             <!-- Do deploy current project -->

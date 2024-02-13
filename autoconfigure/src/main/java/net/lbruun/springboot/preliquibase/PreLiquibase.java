@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.springframework.beans.factory.config.PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX;
 import static org.springframework.beans.factory.config.PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX;
 import static org.springframework.beans.factory.config.PlaceholderConfigurerSupport.DEFAULT_VALUE_SEPARATOR;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -32,10 +33,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
 import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -43,6 +47,7 @@ import org.springframework.jdbc.datasource.init.ScriptException;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 import org.springframework.util.StreamUtils;
+
 import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptReadError;
 import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptVarError;
 
@@ -69,7 +74,7 @@ import net.lbruun.springboot.preliquibase.PreLiquibaseException.SqlScriptVarErro
  */
 public class PreLiquibase {
 
-    // Credit:  
+    // Credit:
     // Originally this class was heavily "inspired" (read: copied from) the
     // org.springframework.boot.autoconfigure.jdbc.DataSourceInitializer class.
     // However, over time, the two now have much less in common.
@@ -183,6 +188,8 @@ public class PreLiquibase {
      * </ul>
      *
      * @return true if at least one SQL script was executed (successfully or with error)
+     * @throws PreLiquibaseException.UninitializedError if the method is
+     *                                                  invoked prior to {@link #execute()}.
      */
     public boolean hasExecutedScripts() {
         if (!hasExecuted) {
@@ -195,10 +202,9 @@ public class PreLiquibase {
      * Execute SQL sql scripts if required.
      *
      * @return {@code true} if the SQL script was attempted executed.
-     * @throws ScriptException (or subclass) if a SQL script file cannot be read or there's
-     *                            a SQL execution error.
      */
     private boolean executeSQLScripts() {
+
         if (!properties.isEnabled()) {
             logger.debug("Initialization disabled (not running SQL script)");
             return false;
@@ -219,12 +225,13 @@ public class PreLiquibase {
         // In the following: If property 'spring.liquibase.liquibase-schema'
         // isn't available then use property 'spring.liquibase.default-schema'
         // instead. (Liquibase itself does the exact same thing)
-        // This means the SQL script can use property 'spring.liquibase.liquibase-schema'
+        // This means the SQL script can use property
+        // 'spring.liquibase.liquibase-schema'
         // even if this property is not set.
-        Map<String, String> defaultsMapping = Stream.of(new String[][] {{"spring.liquibase.liquibase-schema", "spring.liquibase.default-schema"},}).collect(toMap(data -> data[0], data -> data[1]));
+        Map<String, String> defaultsMapping = Stream.of(new String[][] { { "spring.liquibase.liquibase-schema", "spring.liquibase.default-schema" }, }).collect(toMap(data -> data[0], data -> data[1]));
 
         PreLiquibasePlaceholderResolver preLiquibasePlaceholderResolver = new PreLiquibasePlaceholderResolver(environment, defaultsMapping);
-        PropertyPlaceholderHelper placeholderReplacer = new PropertyPlaceholderHelper(DEFAULT_PLACEHOLDER_PREFIX, DEFAULT_PLACEHOLDER_SUFFIX, DEFAULT_VALUE_SEPARATOR, false // error on unresolvable placeholders);
+        PropertyPlaceholderHelper placeholderReplacer = new PropertyPlaceholderHelper(DEFAULT_PLACEHOLDER_PREFIX, DEFAULT_PLACEHOLDER_SUFFIX, DEFAULT_VALUE_SEPARATOR, false /* error on unresolvable placeholders */);
 
         List<Resource> newList = new ArrayList<>(resources.size());
         for (Resource resource : resources) {
@@ -268,8 +275,8 @@ public class PreLiquibase {
     }
 
     /**
-     * PlaceholderResolver which can optionally use a backup property in-lieu
-     * of another property if that property isn't available.
+     * PlaceholderResolver which can optionally use a backup property in-lieu of
+     * another property if that property isn't available.
      */
     private static class PreLiquibasePlaceholderResolver implements PlaceholderResolver {
 
