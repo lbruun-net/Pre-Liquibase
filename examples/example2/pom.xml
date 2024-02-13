@@ -27,7 +27,7 @@ limitations under the License.
     <artifactId>preliquibase-spring-boot-example-2</artifactId>
     <version>1.5.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Spring Boot AutoConfiguration :: Pre-Liquibase :: Example 2</name>
+    <name>Spring Boot AutoConfiguration :: Pre-Liquibase Example 2</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,7 +65,7 @@ limitations under the License.
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
- 
+
         <dependency>
             <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-starter</artifactId>
@@ -100,6 +100,8 @@ limitations under the License.
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
