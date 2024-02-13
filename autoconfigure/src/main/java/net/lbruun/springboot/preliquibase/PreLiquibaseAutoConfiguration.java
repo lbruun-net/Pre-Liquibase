@@ -59,7 +59,7 @@ import net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration.Liquibas
     PreLiquibaseProperties.class})
 public class PreLiquibaseAutoConfiguration {
 
-  Logger logger = LoggerFactory.getLogger(PreLiquibaseAutoConfiguration.class);
+  private static final Logger logger = LoggerFactory.getLogger(PreLiquibaseAutoConfiguration.class);
 
   /**
    * Returns provider which will tell which {@code DataSource} to use for Pre-Liquibase. This will
@@ -90,7 +90,7 @@ public class PreLiquibaseAutoConfiguration {
       PreLiquibaseDataSourceProvider dataSourceProvider) {
     logger.debug("Instantiation of PreLiquibase");
 
-    final PreLiquibase preLiquibase =
+    PreLiquibase preLiquibase =
         new PreLiquibase(environment, dataSourceProvider.getDataSource(), properties);
     preLiquibase.execute();
     return preLiquibase;
@@ -103,12 +103,13 @@ public class PreLiquibaseAutoConfiguration {
    * Pre-Liquibase must execute before Liquibase, we declare the opposite: that Liquibase must
    * execute after Pre-Liquibase.
    */
-  @Configuration()
+  @Configuration
   @ConditionalOnClass(SpringLiquibase.class)
   static class LiquibaseOnPreLiquibaseDependencyPostProcessor
       extends AbstractDependsOnBeanFactoryPostProcessor {
 
-    Logger logger = LoggerFactory.getLogger(LiquibaseOnPreLiquibaseDependencyPostProcessor.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(LiquibaseOnPreLiquibaseDependencyPostProcessor.class);
 
     LiquibaseOnPreLiquibaseDependencyPostProcessor() {
       super(SpringLiquibase.class, PreLiquibase.class);
@@ -121,44 +122,47 @@ public class PreLiquibaseAutoConfiguration {
    * JdbcConnectionDetails bean must exist, or the user must have declared explicitly a JDBC URL for
    * use with Liquibase.
    */
-  static final class LiquibaseDataSourceCondition extends AnyNestedCondition {
+  static class LiquibaseDataSourceCondition extends AnyNestedCondition {
 
     LiquibaseDataSourceCondition() {
       super(ConfigurationPhase.REGISTER_BEAN);
     }
 
     @ConditionalOnBean(DataSource.class)
-    private static final class DataSourceBeanCondition {
+    private static class DataSourceBeanCondition {
     }
 
     @ConditionalOnBean(JdbcConnectionDetails.class)
-    private static final class JdbcConnectionDetailsCondition {
+    private static class JdbcConnectionDetailsCondition {
     }
 
     @ConditionalOnProperty(prefix = "spring.liquibase", name = "url", matchIfMissing = false)
-    private static final class LiquibaseUrlCondition {
+    private static class LiquibaseUrlCondition {
     }
   }
 
   /**
    * Condition that says that both of the properties
-   * <p>
-   * 'preliquibase.enabled' 'spring.liquibase.enabled'
-   * <p>
-   * must not have a value of "false"Â´or the property must be absent.
+   *
+   * <pre>
+   * preliquibase.enabled
+   * spring.liquibase.enabled
+   * </pre>
+   *
+   * must not have a value of {@code false} or the property must be absent.
    */
-  static final class EnabledCondition extends AllNestedConditions {
+  static class EnabledCondition extends AllNestedConditions {
 
     EnabledCondition() {
       super(ConfigurationPhase.REGISTER_BEAN);
     }
 
     @ConditionalOnProperty(prefix = "preliquibase", name = "enabled", matchIfMissing = true)
-    private static final class preLiquibaseEnabledCondition {
+    private static class preLiquibaseEnabledCondition {
     }
 
     @ConditionalOnProperty(prefix = "spring.liquibase", name = "enabled", matchIfMissing = true)
-    private static final class liquibaseEnabledCondition {
+    private static class liquibaseEnabledCondition {
     }
   }
 
@@ -185,6 +189,7 @@ public class PreLiquibaseAutoConfiguration {
      *        DataSource which has been annotated with {@code @LiquibaseDataSource} in order to mark
      *        it as designated for Liquibase. If this DataSource exists it will be used in
      *        preference to a DataSource in {@code dataSource} parameter.
+     * @param connectionDetails
      */
     public DefaultPreLiquibaseDataSourceProvider(@NonNull LiquibaseProperties liquibaseProperties,
         @NonNull DataSourceProperties dataSourceProperties,
@@ -197,19 +202,19 @@ public class PreLiquibaseAutoConfiguration {
       // by LiquibaseAutoConfiguration. This ensures that we use the same
       // logic for figuring out which DataSource to use.
       // Note that SpringLiquibase object below gets instantiated OUTSIDE
-      // of the IoC container, meaning it is just normal "new" instantiaion.
+      // of the IoC container, meaning it is just normal "new" instantiation.
       // This is important as we do not want the SpringLiquibase's
       // afterPropertiesSet method to kick in. All we are interested in
       // is to figure out which datasource Liquibase would be using.
-      final LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration =
+      LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration =
           new LiquibaseAutoConfiguration.LiquibaseConfiguration();
-      final SpringLiquibase liquibase = liquibaseConfiguration.liquibase(dataSource,
-          liquibaseDataSource, liquibaseProperties, connectionDetails);
+      SpringLiquibase liquibase = liquibaseConfiguration.liquibase(dataSource, liquibaseDataSource,
+          liquibaseProperties, connectionDetails);
 
       // Sanity check
-      requireNonNull(liquibase.getDataSource(),
+
+      dataSourceToUse = requireNonNull(liquibase.getDataSource(),
           "Unexpected: null value for DataSource returned from SpringLiquibase class");
-      dataSourceToUse = liquibase.getDataSource();
     }
 
     @Override

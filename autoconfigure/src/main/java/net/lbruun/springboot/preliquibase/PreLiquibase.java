@@ -16,7 +16,6 @@ package net.lbruun.springboot.preliquibase;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
-import static net.lbruun.springboot.preliquibase.PreLiquibaseException.UninitializedError.DEFAULT;
 import static org.springframework.beans.factory.config.PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX;
 import static org.springframework.beans.factory.config.PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX;
 import static org.springframework.beans.factory.config.PlaceholderConfigurerSupport.DEFAULT_VALUE_SEPARATOR;
@@ -152,7 +151,7 @@ public class PreLiquibase {
    */
   public List<Resource> getFilteredResources() {
     if (!hasExecuted) {
-      throw DEFAULT;
+      throw PreLiquibaseException.UninitializedError.DEFAULT;
     }
     return filteredResources;
   }
@@ -183,7 +182,7 @@ public class PreLiquibase {
    */
   public boolean hasExecutedScripts() {
     if (!hasExecuted) {
-      throw DEFAULT;
+      throw PreLiquibaseException.UninitializedError.DEFAULT;
     }
     return hasExecutedScripts;
   }
@@ -192,7 +191,7 @@ public class PreLiquibase {
    * Execute SQL sql scripts if required.
    *
    * @return {@code true} if the SQL script was attempted executed.
-   * @throws ScriptionException (or subclass) if a SQL script files cannot be read or there's a SQL
+   * @throws ScriptException (or subclass) if a SQL script file cannot be read or there's a SQL
    *         execution error.
    */
   private boolean executeSQLScripts() {
@@ -219,25 +218,25 @@ public class PreLiquibase {
     // instead. (Liquibase itself does the exact same thing)
     // This means the SQL script can use property 'spring.liquibase.liquibase-schema'
     // even if this property is not set.
-    final Map<String, String> defaultsMapping = Stream.of(
+    Map<String, String> defaultsMapping = Stream.of(
         new String[][] {{"spring.liquibase.liquibase-schema", "spring.liquibase.default-schema"},})
         .collect(toMap(data -> data[0], data -> data[1]));
 
-    final PreLiquibasePlaceholderResolver preLiquibasePlaceholderResolver =
+    PreLiquibasePlaceholderResolver preLiquibasePlaceholderResolver =
         new PreLiquibasePlaceholderResolver(environment, defaultsMapping);
-    final PropertyPlaceholderHelper placeholderReplacer = new PropertyPlaceholderHelper(
+    PropertyPlaceholderHelper placeholderReplacer = new PropertyPlaceholderHelper(
         DEFAULT_PLACEHOLDER_PREFIX, DEFAULT_PLACEHOLDER_SUFFIX, DEFAULT_VALUE_SEPARATOR, false // error
                                                                                                // on
                                                                                                // unresolvable
                                                                                                // placeholders
     );
 
-    final List<Resource> newList = new ArrayList<>(resources.size());
-    for (final Resource resource : resources) {
+    List<Resource> newList = new ArrayList<>(resources.size());
+    for (Resource resource : resources) {
       try (InputStream in = resource.getInputStream()) {
-        final String txt = StreamUtils.copyToString(in, properties.getSqlScriptEncoding());
+        String txt = StreamUtils.copyToString(in, properties.getSqlScriptEncoding());
 
-        final String filteredTxt =
+        String filteredTxt =
             placeholderReplacer.replacePlaceholders(txt, preLiquibasePlaceholderResolver);
         if (!filteredTxt.equals(txt)) {
           logger.debug("SQL script {} before replacement variable substitution : {}", resource,
@@ -249,10 +248,10 @@ public class PreLiquibase {
         }
         newList.add(
             new StringShadowResource(filteredTxt, resource, properties.getSqlScriptEncoding()));
-      } catch (final IOException ex) {
+      } catch (IOException ex) {
         throw new SqlScriptReadError(
             format("Could not read SQL script file \"%s into memory", resource), ex);
-      } catch (final IllegalArgumentException ex) {
+      } catch (IllegalArgumentException ex) {
         throw new SqlScriptVarError(
             format("Could not replace variables in script file \"%s\"", resource), ex);
       }
@@ -261,7 +260,7 @@ public class PreLiquibase {
   }
 
   private void runScripts() throws ScriptException {
-    final List<Resource> resources = filteredResources;
+    List<Resource> resources = filteredResources;
     if (resources.isEmpty()) {
       return;
     }
@@ -269,7 +268,7 @@ public class PreLiquibase {
     resources.stream()
         .forEach(resource -> logger.info("PreLiquibase: Executing SQL scripts : {}", resource));
 
-    final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+    ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
     populator.setContinueOnError(properties.isContinueOnError());
     populator.setSeparator(properties.getSeparator());
     if (nonNull(properties.getSqlScriptEncoding())) {
