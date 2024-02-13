@@ -47,7 +47,7 @@ import org.springframework.core.io.Resource;
 @ExtendWith(OutputCaptureExtension.class)
 public class PreLiquibaseAutoConfigurationTest {
 
-  private static final String JDBC_URL1 = "jdbc:hsqldb:mem:stdtest";
+  private static String JDBC_URL1 = "jdbc:hsqldb:mem:stdtest";
   private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
       .withConfiguration(AutoConfigurations.of(PreLiquibaseAutoConfiguration.class,
           LiquibaseAutoConfiguration.class))
@@ -67,23 +67,52 @@ public class PreLiquibaseAutoConfigurationTest {
     // If not, the schema 'myschema' will not have been created when Liquibase
     // executes and Liquibase will therefore fail.
 
-    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-        .withPropertyValues("spring.datasource.url = " + JDBC_URL1,
-            "sql.script.schemaname = myschema", "spring.liquibase.default-schema = myschema")
-        .run(assertPreLiquibase(preLiquibase -> {
+    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class).withPropertyValues(
+    // @formatter:off
+      "spring.datasource.url = " + JDBC_URL1,
+      "sql.script.schemaname = myschema",
+      "spring.liquibase.default-schema = myschema"
+    // @formatter:on
+    ).run(assertPreLiquibase(preLiquibase -> {
 
-          // Assert that PreLiquibase has resolved the db platform correctly
-          assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
+      // Assert that PreLiquibase has resolved the db platform correctly
+      assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
 
-          // Assert that something was executed.
-          assertThat(preLiquibase.hasExecutedScripts()).isTrue();
+      // Assert that something was executed.
+      assertThat(preLiquibase.hasExecutedScripts()).isTrue();
 
-          // Assert that only one script has executed
-          assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
+      // Assert that only one script has executed
+      assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
 
-          // Assert which script was executed
-          assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase/hsqldb.sql");
-        }));
+      // Assert which script was executed
+      assertThat(getScriptFileName(preLiquibase, 0)).endsWith("preliquibase/hsqldb.sql");
+    }));
+  }
+
+  @Test
+  void sqlScriptsInCustomLocation() {
+    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class).withPropertyValues(
+    // @formatter:off
+      "spring.datasource.url = " + JDBC_URL1,
+      "preliquibase.sql-script-references = file:src/test/resources/preliquibase-customlocation/hsqldb.sql, file:src/test/resources/preliquibase-customlocation/default.sql",
+      "sql.script.schemaname = myschema",
+      "spring.liquibase.default-schema = myschema"
+    // @formatter:on
+    ).run(assertPreLiquibase(preLiquibase -> {
+
+      // Assert that PreLiquibase has resolved the db platform correctly
+      assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
+
+      // Assert that something was executed.
+      assertThat(preLiquibase.hasExecutedScripts()).isTrue();
+
+      // Assert that two scripts has executed
+      assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
+
+      // Assert which script was executed
+      assertThat(getScriptFileName(preLiquibase, 0))
+          .endsWith("preliquibase-customlocation/hsqldb.sql");
+    }));
   }
 
   @Test
@@ -123,31 +152,7 @@ public class PreLiquibaseAutoConfigurationTest {
 
   }
 
-  @Test
-  void sqlScriptsInCustomLocation() {
-    contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class).withPropertyValues(
-    // @formatter:off
-        "spring.datasource.url = " + JDBC_URL1,
-        "preliquibase.sqlScriptReferences = file:src/test/resources/preliquibase-customlocation/hsqldb.sql, file:src/test/resources/preliquibase-customlocation/default.sql",
-        "sql.script.schemaname = myschema",
-        "spring.liquibase.default-schema = myschema"
-    // @formatter:on
-    ).run(assertPreLiquibase(preLiquibase -> {
 
-      // Assert that PreLiquibase has resolved the db platform correctly
-      assertThat(preLiquibase.getDbPlatformCode()).isEqualTo("hsqldb");
-
-      // Assert that something was executed.
-      assertThat(preLiquibase.hasExecutedScripts()).isTrue();
-
-      // Assert that two scripts has executed
-      assertThat(preLiquibase.getUnfilteredResources()).hasSize(1);
-
-      // Assert which script was executed
-      assertThat(getScriptFileName(preLiquibase, 0))
-          .endsWith("preliquibase-customlocation/hsqldb.sql");
-    }));
-  }
 
   // Utility methods
 
@@ -155,22 +160,22 @@ public class PreLiquibaseAutoConfigurationTest {
       Consumer<PreLiquibase> consumer) {
     return context -> {
       assertThat(context).hasSingleBean(PreLiquibase.class);
-      final PreLiquibase preLiquibase = context.getBean(PreLiquibase.class);
+      PreLiquibase preLiquibase = context.getBean(PreLiquibase.class);
       consumer.accept(preLiquibase);
     };
   }
 
   private String getScriptFileName(PreLiquibase preLiquibase, int scriptNo) {
 
-    final List<Resource> unfilteredResources = preLiquibase.getUnfilteredResources();
+    List<Resource> unfilteredResources = preLiquibase.getUnfilteredResources();
     if (unfilteredResources == null || unfilteredResources.size() - 1 < scriptNo) {
       throw new RuntimeException("No such scriptNo");
     }
-    final Resource res = unfilteredResources.get(scriptNo);
+    Resource res = unfilteredResources.get(scriptNo);
 
     try {
       return res.getURL().getPath();
-    } catch (final IOException ex) {
+    } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
   }
@@ -198,7 +203,6 @@ public class PreLiquibaseAutoConfigurationTest {
 
     @Bean
     PreLiquibase customPreLiquibase(Environment environment, PreLiquibaseProperties properties) {
-
       return new PreLiquibase(environment, DataSourceBuilder.create().url(JDBC_URL1).build(),
           properties);
     }

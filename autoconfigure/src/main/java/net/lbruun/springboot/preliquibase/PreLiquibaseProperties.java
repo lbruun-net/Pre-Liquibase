@@ -57,7 +57,7 @@ public class PreLiquibaseProperties {
   /**
    * SQL script resource references.
    */
-  private List<Resource> sqlScriptReferences;
+  private List<Resource> sqlScriptReferences = List.of();
 
   /**
    * Whether to stop if an error occurs while executing the SQL script.
@@ -179,14 +179,17 @@ public class PreLiquibaseProperties {
    * @see #setSqlScriptReferences(java.util.List)
    */
   public List<Resource> getSqlScriptReferences() {
-    return requireNonNullElseGet(sqlScriptReferences,
-        () -> List.of(resourceLoader.getResource("classpath:preliquibase")));
+    if (sqlScriptReferences.isEmpty()) {
+      return List.of(resourceLoader.getResource("classpath:preliquibase"));
+    }
+
+    return sqlScriptReferences;
   }
 
   private final Predicate<Resource> targetFile = res -> {
     try {
       return isNull(res.getFile().listFiles());
-    } catch (final IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return false;
@@ -195,7 +198,7 @@ public class PreLiquibaseProperties {
   private final Predicate<Resource> targetDirectory = res -> {
     try {
       return nonNull(res.getFile().listFiles());
-    } catch (final IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return false;
@@ -205,7 +208,7 @@ public class PreLiquibaseProperties {
     try {
       return List.of(res.getFile().listFiles()).stream().map(File::toURI).map(URI::toString)
           .map(resourceLoader::getResource).collect(toList());
-    } catch (final IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return List.of();
@@ -252,18 +255,17 @@ public class PreLiquibaseProperties {
      * @param sqlScriptReferences list of Spring Resource references.
      */
     // @formatter:on
-  public void setSqlScriptReferences(List<Resource> sqlScriptReferences) {
-    this.sqlScriptReferences = sqlScriptReferences;
+  public void setSqlScriptReferences(Resource[] sqlScriptReferences) {
+    this.sqlScriptReferences = List.of(sqlScriptReferences);
   }
 
   public List<Resource> getScripts() {
-    final List<Resource> files =
-        getSqlScriptReferences().stream().filter(targetFile).collect(toList());
+    List<Resource> files = getSqlScriptReferences().stream().filter(targetFile).collect(toList());
 
-    final List<Resource> directories = getSqlScriptReferences().stream().filter(targetDirectory)
+    List<Resource> directories = getSqlScriptReferences().stream().filter(targetDirectory)
         .map(loadFiles).flatMap(List::stream).collect(toList());
 
-    final String platformCode = getDbPlatformCode();
+    String platformCode = getDbPlatformCode();
 
     sqlScriptReferences = Stream.concat(files.stream(), directories.stream())
         .filter(res -> res.getFilename().contains(platformCode)).collect(toList());
@@ -275,10 +277,9 @@ public class PreLiquibaseProperties {
       return getSqlScriptReferences();
     }
 
-    final Resource typedFallback =
+    Resource typedFallback =
         resourceLoader.getResource(format("classpath:preliquibase/%s.sql", getDbPlatformCode()));
-    final Resource defaultFallback =
-        resourceLoader.getResource("classpath:preliquibase/default.sql");
+    Resource defaultFallback = resourceLoader.getResource("classpath:preliquibase/default.sql");
 
     return List.of(typedFallback.exists() ? typedFallback : defaultFallback);
   }
