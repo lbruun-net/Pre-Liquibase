@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +15,14 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa;
 
-import net.lbruun.springboot.preliquibase.example.jpa.db1.Person;
-import net.lbruun.springboot.preliquibase.example.jpa.db1.PersonRepo;
+import static org.assertj.core.api.Assertions.assertThat;
+import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import net.lbruun.springboot.preliquibase.example.jpa.db1.Person;
+import net.lbruun.springboot.preliquibase.example.jpa.db1.PersonRepo;
 
 /**
  * Example Unit test. Not meant to be a show case for best practice of writing
@@ -33,28 +31,30 @@ import static org.assertj.core.api.Assertions.assertThat;
  * The main point here is that you can use the @DataJpaTest annotation because
  * it will include Pre-Liquibase auto-configuration
  */
-@DataJpaTest(properties = {"spring.liquibase.change_log=classpath:/liquibase/db1/changelog/db.changelog-master.yaml"})
+@DataJpaTest(properties = {
+    "spring.liquibase.change_log=classpath:/liquibase/db1/changelog/db.changelog-master.yaml",
+    "preliquibase.sql-script-references=classpath:preliquibase/db1/"})
 public class PersonRepoTest {
 
-    @Autowired
-    private PersonRepo personRepo;
+  @Autowired
+  private PersonRepo personRepo;
 
-    @Test
-    void injectedComponentsAreNotNull() {
-        assertThat(personRepo).isNotNull();
-    }
+  @Test
+  void injectedComponentsAreNotNull() {
+    assertThat(personRepo).isNotNull();
+  }
 
-    @Test
-    void saveAndRetrievePerson() {
+  @Test
+  void saveAndRetrievePerson() {
 
-        Person person = new Person();
-        person.setFirstName("John");
-        person.setLastName("Doe");
-        person.setBirthDate(LocalDate.of(1996, 12, 4));
-        personRepo.save(person);
+    Person person = new Person();
+    person.setFirstName("John");
+    person.setLastName("Doe");
+    person.setBirthDate(LocalDate.of(1996, 12, 4));
+    personRepo.save(person);
 
-        // See if we can find the person we just saved
-        Optional<Person> personOpt = personRepo.findById(person.getPersonId());
-        assertThat(personOpt).isNotEmpty();
-    }
+    // See if we can find the person we just saved
+    Optional<Person> personOpt = personRepo.findById(person.getPersonId());
+    assertThat(personOpt).isNotEmpty();
+  }
 }
