@@ -1,31 +1,25 @@
 # Ignore Maven stuff
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
+target
+pom.xml.*
 release.properties
 dependency-reduced-pom.xml
 .flattened-pom.xml
 buildNumber.properties
-.mvn/timing.properties
+.mvn
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
-
-
 
 # Ignore Eclipse stuff
 .classpath
 .project
-.settings/
+.settings
 .factorypath
 
 # Ignore IntelliJ IDEA stuff
-.idea/
+.idea
 *.iml
 *.iws
 
 # Ignore NetBeans stuff
-nbproject/
+nbproject
 nbactions.xml
 nb-configuration.xml
