@@ -18,7 +18,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-parent</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.6.0-SNAPHSOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>autoconfigure</module>
@@ -60,14 +60,12 @@ limitations under the License.
         <tag>HEAD</tag>
     </scm>
 
-
     <distributionManagement>
         <repository>
             <id>ossrh-lbruun</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-
 
     <developers>
         <developer>
@@ -87,12 +85,15 @@ limitations under the License.
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>net.lbruun.springboot</groupId>
+                <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
+                <version>1.6.0-SNAPHSOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
-
     <build>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -154,7 +155,6 @@ limitations under the License.
 
         </plugins>
     </build>
-
 
     <profiles>
         <profile>
