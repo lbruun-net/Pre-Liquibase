@@ -15,10 +15,7 @@
  */
 package net.lbruun.springboot.preliquibase.example;
 
-import liquibase.integration.spring.SpringLiquibase;
-import net.lbruun.springboot.preliquibase.PreLiquibase;
-import net.lbruun.springboot.preliquibase.PreLiquibaseProperties;
-import net.lbruun.springboot.preliquibase.example.jpa.JpaPropertiesEnchanced;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
@@ -26,7 +23,6 @@ import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -37,8 +33,10 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.sql.DataSource;
+import liquibase.integration.spring.SpringLiquibase;
+import net.lbruun.springboot.preliquibase.PreLiquibase;
+import net.lbruun.springboot.preliquibase.PreLiquibaseProperties;
+import net.lbruun.springboot.preliquibase.example.jpa.JpaPropertiesEnchanced;
 
 @Configuration
 @EnableConfigurationProperties({MedusaProperties.class})
@@ -79,7 +77,7 @@ public class MedusaApplicationConfig {
             liquibase.setRollbackFile(liquibaseProperties.getRollbackFile());
             liquibase.setTestRollbackOnUpdate(liquibaseProperties.isTestRollbackOnUpdate());
             liquibase.setTag(liquibaseProperties.getTag());
-            return liquibase;  // Liquibase will fire as part of afterPropertiesSet() method on SpringLiquibase object
+            return liquibase; // Liquibase will fire as part of afterPropertiesSet() method on SpringLiquibase object
         }
 
         // Utility methods for Spring Boot JPA setup
@@ -102,14 +100,14 @@ public class MedusaApplicationConfig {
 
             @Bean
             @ConfigurationProperties("persistence.datasource.db1")
-            public DataSourceProperties db1DataSourceProperties() {
-                Class<?>[] name = new Class<?>[]{String.class};
+            DataSourceProperties db1DataSourceProperties() {
+                Class<?>[] name = {String.class}; // TODO check if useful
                 return new DataSourceProperties();
             }
 
             @Bean
             @ConfigurationProperties("persistence.datasource.poolconfig.db1")
-            public DataSource db1DataSource(
+            DataSource db1DataSource(
                     @Qualifier("db1DataSourceProperties") DataSourceProperties dataSourceProperties) {
                 return dataSourceProperties.initializeDataSourceBuilder()
                         .build();
@@ -117,35 +115,33 @@ public class MedusaApplicationConfig {
 
             @Bean
             @ConfigurationProperties("persistence.preliquibase.db1")
-            public PreLiquibaseProperties db1PreLiquibaseProperties() {
+            PreLiquibaseProperties db1PreLiquibaseProperties() {
                 return new PreLiquibaseProperties();
             }
 
             @Bean("db1PreLiquibase")
-            public PreLiquibase db1PreLiquibase(
+            PreLiquibase db1PreLiquibase(
                     @Qualifier("db1DataSource") DataSource dataSource,
                     Environment environment,
-                    @Qualifier("db1PreLiquibaseProperties") PreLiquibaseProperties properties,
-                    ApplicationContext applicationContext) {
+                    @Qualifier("db1PreLiquibaseProperties") PreLiquibaseProperties properties) {
 
                 PreLiquibase preLiquibase = new PreLiquibase(
                         environment,
                         dataSource,
-                        properties,
-                        applicationContext);
+                        properties);
                 preLiquibase.execute();
                 return preLiquibase;
             }
 
             @Bean
             @ConfigurationProperties("persistence.liquibase.db1")
-            public LiquibaseProperties db1LiquibaseProperties() {
+            LiquibaseProperties db1LiquibaseProperties() {
                 return new LiquibaseProperties();
             }
 
             @Bean
             @DependsOn({"db1PreLiquibase"})
-            public SpringLiquibase db1Liquibase(
+            SpringLiquibase db1Liquibase(
                     @Qualifier("db1DataSource") DataSource dataSource,
                     @Qualifier("db1LiquibaseProperties") LiquibaseProperties liquibaseProperties) {
                 return getSpringLiquibase(dataSource, liquibaseProperties);
@@ -153,13 +149,13 @@ public class MedusaApplicationConfig {
 
             @Bean
             @ConfigurationProperties("persistence.jpa.db1")
-            public JpaPropertiesEnchanced db1JpaProperties() {
+            JpaPropertiesEnchanced db1JpaProperties() {
                 return new JpaPropertiesEnchanced();
             }
 
             @Bean
             @DependsOn({"db1Liquibase"})
-            public LocalContainerEntityManagerFactoryBean db1EntityManagerFactory(
+            LocalContainerEntityManagerFactoryBean db1EntityManagerFactory(
                     @Qualifier("db1DataSource") DataSource dataSource,
                     @Qualifier("db1JpaProperties") JpaPropertiesEnchanced jpaProperties) {
                 EntityManagerFactoryBuilder builder = createEntityManagerFactoryBuilder(jpaProperties);
@@ -171,8 +167,8 @@ public class MedusaApplicationConfig {
             }
 
             @Bean
-            public PlatformTransactionManager db1TransactionManager(
-                    final @Qualifier("db1EntityManagerFactory") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+            PlatformTransactionManager db1TransactionManager(
+                    @Qualifier("db1EntityManagerFactory") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
                 return new JpaTransactionManager(entityManagerFactory.getObject());
             }
 
@@ -186,13 +182,13 @@ public class MedusaApplicationConfig {
 
             @Bean
             @ConfigurationProperties("persistence.datasource.db2")
-            public DataSourceProperties db2DataSourceProperties() {
+            DataSourceProperties db2DataSourceProperties() {
                 return new DataSourceProperties();
             }
 
             @Bean
             @ConfigurationProperties("persistence.datasource.poolconfig.db2")
-            public DataSource db2DataSource(
+            DataSource db2DataSource(
                     @Qualifier("db2DataSourceProperties") DataSourceProperties dataSourceProperties) {
                 return dataSourceProperties.initializeDataSourceBuilder()
                         .build();
@@ -200,35 +196,33 @@ public class MedusaApplicationConfig {
 
             @Bean
             @ConfigurationProperties("persistence.preliquibase.db2")
-            public PreLiquibaseProperties db2PreLiquibaseProperties() {
+            PreLiquibaseProperties db2PreLiquibaseProperties() {
                 return new PreLiquibaseProperties();
             }
 
             @Bean("db2PreLiquibase")
-            public PreLiquibase db2PreLiquibase(
+            PreLiquibase db2PreLiquibase(
                     @Qualifier("db2DataSource") DataSource dataSource,
                     Environment environment,
-                    @Qualifier("db2PreLiquibaseProperties") PreLiquibaseProperties properties,
-                    ApplicationContext applicationContext) {
+                    @Qualifier("db2PreLiquibaseProperties") PreLiquibaseProperties properties) {
 
                 PreLiquibase preLiquibase = new PreLiquibase(
                         environment,
                         dataSource,
-                        properties,
-                        applicationContext);
+                        properties);
                 preLiquibase.execute();
                 return preLiquibase;
             }
 
             @Bean
             @ConfigurationProperties("persistence.liquibase.db2")
-            public LiquibaseProperties db2LiquibaseProperties() {
+            LiquibaseProperties db2LiquibaseProperties() {
                 return new LiquibaseProperties();
             }
 
             @Bean
             @DependsOn({"db2PreLiquibase"})
-            public SpringLiquibase db2Liquibase(
+            SpringLiquibase db2Liquibase(
                     @Qualifier("db2DataSource") DataSource dataSource,
                     @Qualifier("db2LiquibaseProperties") LiquibaseProperties liquibaseProperties) {
                 return getSpringLiquibase(dataSource, liquibaseProperties);
@@ -236,13 +230,13 @@ public class MedusaApplicationConfig {
 
             @Bean
             @ConfigurationProperties("persistence.jpa.db2")
-            public JpaPropertiesEnchanced db2JpaProperties() {
+            JpaPropertiesEnchanced db2JpaProperties() {
                 return new JpaPropertiesEnchanced();
             }
 
             @Bean
             @DependsOn({"db2Liquibase"})
-            public LocalContainerEntityManagerFactoryBean db2EntityManagerFactory(
+            LocalContainerEntityManagerFactoryBean db2EntityManagerFactory(
                     @Qualifier("db2DataSource") DataSource dataSource,
                     @Qualifier("db2JpaProperties") JpaPropertiesEnchanced jpaProperties) {
                 EntityManagerFactoryBuilder builder = createEntityManagerFactoryBuilder(jpaProperties);
@@ -254,8 +248,8 @@ public class MedusaApplicationConfig {
             }
 
             @Bean
-            public PlatformTransactionManager db2TransactionManager(
-                    final @Qualifier("db2EntityManagerFactory") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+            PlatformTransactionManager db2TransactionManager(
+                    @Qualifier("db2EntityManagerFactory") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
                 return new JpaTransactionManager(entityManagerFactory.getObject());
             }
         }
