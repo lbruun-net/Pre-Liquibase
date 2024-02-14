@@ -22,7 +22,7 @@ Companion to https://docs.spring.io/spring-boot/docs/current/reference/html/howt
 which allows to execute some SQL script file _prior_ to executing https://www.liquibase.org/[Liquibase] ChangeSets.
 
 Why? While you should be using Liquibase for all your DDL there's a bit of a chicken-and-egg problem: 
-The database and schema where Liquibase puts itself into obviously cannot be created by Liquibase itself. 
+The database and schema where Liquibase puts itself into obviously cannot be created by Liquibase itself.
 This module solves this problem by allowing you to "deploy" such DB prerequisities as part of your application code.
 Typical use is to create database schema or database catalog so that Liquibase objects have "a home" where
 they can live.
@@ -38,7 +38,7 @@ If not, you should pause and ask yourself if you are doing the right thing.
 The module requires 
 
 - Java 17 or later (artifacts before `1.3` only require Java 8 but do not support Spring Boot 3)
-- Spring Boot 3.0 or later (for older versions see <<Spring Boot compatibility>>)
+- Spring Boot 3.2.2 or later (for older versions see <<Spring Boot compatibility>>)
 
 {nbsp} +
 {nbsp} +
