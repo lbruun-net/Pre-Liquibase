@@ -28,7 +28,6 @@ public abstract class PreLiquibaseException extends RuntimeException {
 
     public PreLiquibaseException(String message, Throwable cause) {
         super(message, cause);
-
     }
 
     /**
@@ -37,7 +36,7 @@ public abstract class PreLiquibaseException extends RuntimeException {
      */
     public static class UninitializedError extends PreLiquibaseException {
 
-        public static final UninitializedError DEFAULT = new UninitializedError("Method must not be invoked prior to execute()");
+        public static UninitializedError DEFAULT = new UninitializedError("Method must not be invoked prior to execute()");
 
         public UninitializedError(String message) {
             super(message);
