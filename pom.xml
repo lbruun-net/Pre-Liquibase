@@ -111,7 +111,7 @@ limitations under the License.
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release-to-central,ossrh-gpg-lbruun</releaseProfiles>
+                    <releaseProfiles>release-to-central</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
