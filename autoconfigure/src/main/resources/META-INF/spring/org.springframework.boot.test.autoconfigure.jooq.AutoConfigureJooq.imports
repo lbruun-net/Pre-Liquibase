@@ -1,0 +1,7 @@
+# (additional) AutoConfigureJooq auto-configuration imports
+# .. for tests.
+#
+# Add Pre-Liquibase class to list of classes autowired when @AutoConfigureJooq
+# or @JooqTest annotations are used in unit tests.
+net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration
+

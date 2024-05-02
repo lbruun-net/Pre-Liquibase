@@ -1,0 +1,7 @@
+# (additional) AutoConfigureDataJdbc auto-configuration imports
+# .. for tests.
+#
+# Add Pre-Liquibase class to list of classes autowired when @AutoConfigureDataJdbc
+# or @DataJdbcTest annotations are used in unit tests.
+net.lbruun.springboot.preliquibase.PreLiquibaseAutoConfiguration
+
