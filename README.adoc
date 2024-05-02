@@ -271,10 +271,18 @@ You should work on that first and only use this setting as a last resort.
 
 === Spring Boot tests
 
-==== Spring Boot `@DataJpaTest` test slice
+==== Spring Boot test slices
 
-You can use Spring Boot's `@DataJpaTest` annotation as you normally would because the Pre-Liquibase module
-registers itself as one of the auto-configs which are in-scope when this annotation is applied to a test class.
+Pre-Liquibase directly supports the following Spring Boot test slices:
+
+- `@DataJdbcTest`  (since version 1.0.0)
+- `@DataJpaTest`   (since version 1.5.1)
+- `@DataR2dbcTest`   (since version 1.5.1)
+- `@JdbcTest`   (since version 1.5.1)
+- `@JooqTest`   (since version 1.5.1)
+
+You can use the above annotations as you normally would because the Pre-Liquibase module
+registers itself as one of the auto-configs which are in-scope when such annotation is applied to a test class.
 
 The link:examples/example1/[example project] showcases this.
 

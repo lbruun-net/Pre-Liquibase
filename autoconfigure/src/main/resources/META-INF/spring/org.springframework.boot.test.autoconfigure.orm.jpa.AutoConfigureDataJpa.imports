@@ -1,5 +1,5 @@
 # (additional) AutoConfigureDataJpa auto-configuration imports
-#
+# .. for tests.
 #
 # Add Pre-Liquibase class to list of classes autowired when @AutoConfigureDataJpa
 # or @DataJpaTest annotations are used in unit tests.
