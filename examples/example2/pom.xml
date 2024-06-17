@@ -26,13 +26,18 @@ limitations under the License.
   </parent>
   <groupId>net.lbruun.springboot</groupId>
   <artifactId>preliquibase-spring-boot-example-2</artifactId>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>${revision}${sha1}${changelist}</version>
   <packaging>jar</packaging>
   <name>Spring Boot AutoConfiguration :: Pre-Liquibase Example 2</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>
+
+    <!-- Some sensible defaults for local development.-->
+    <revision/>
+    <changelist>LATEST-SNAPSHOT</changelist>
+    <sha1/>
   </properties>
 
   <!-- For testing Spring Boot release candidates -->
@@ -70,7 +75,7 @@ limitations under the License.
     <dependency>
       <groupId>net.lbruun.springboot</groupId>
       <artifactId>preliquibase-spring-boot-starter</artifactId>
-      <version>1.5.1-SNAPSHOT</version> <!-- in a real life application you would not use a SNAPSHOT version here -->
+      <version>${project.version}</version> <!-- in a real life application you would use another value here -->
     </dependency>
 
     <!-- JDBC drivers - a real life application would probably have
