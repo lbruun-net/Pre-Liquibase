@@ -18,7 +18,7 @@ on:
   push:
     # Only on push of commits, not push of tags (we have 'release' for that)
     branches:
-      - "*"
+      - "main"
   pull_request:
   workflow_dispatch:
   release:
