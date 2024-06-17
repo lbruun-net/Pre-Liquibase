@@ -15,19 +15,14 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-/**
- * JPA Repository for 'AppEvent' entity.
- */
+/** JPA Repository for 'AppEvent' entity. */
 @Repository
 public interface AppEventRepo extends JpaRepository<AppEvent, Long> {
 
-    /**
-     * Gets the 20 latest events in reverse order (latest first)
-     */
-    List<AppEvent> findTop20ByOrderByEventTimeDesc();
+  /** Gets the 20 latest events in reverse order (latest first) */
+  List<AppEvent> findTop20ByOrderByEventTimeDesc();
 }

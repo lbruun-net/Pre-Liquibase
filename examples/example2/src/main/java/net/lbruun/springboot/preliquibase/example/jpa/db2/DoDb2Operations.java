@@ -19,26 +19,27 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-/**
- * Do something on the database to show that DB operations work.
- */
+/** Do something on the database to show that DB operations work. */
 @Component
 public class DoDb2Operations implements ApplicationRunner {
 
-    private final LogService logService;
+  private final LogService logService;
 
-    public DoDb2Operations(LogService logService) {
-        this.logService = logService;
-    }
+  public DoDb2Operations(LogService logService) {
+    this.logService = logService;
+  }
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        logService.logLoginEvent("JOHN", "192.168.1.55");
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    logService.logLoginEvent("JOHN", "192.168.1.55");
 
-        logService.logSearchEvent("JOHN", "holidays");
+    logService.logSearchEvent("JOHN", "holidays");
 
-        logService.getLatest20Events().forEach((t) -> {
-            System.out.println(t);
-        });
-    }
+    logService
+        .getLatest20Events()
+        .forEach(
+            (t) -> {
+              System.out.println(t);
+            });
+  }
 }

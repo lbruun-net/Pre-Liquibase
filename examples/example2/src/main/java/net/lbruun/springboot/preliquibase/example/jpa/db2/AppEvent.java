@@ -16,81 +16,88 @@
 package net.lbruun.springboot.preliquibase.example.jpa.db2;
 
 import jakarta.persistence.*;
-import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
-
 import java.io.Serializable;
 import java.time.Instant;
+import net.lbruun.springboot.preliquibase.example.jpa.InstantToLongConverter;
 
 /**
- * Example entity. Represents an "event" which happened in the application and
- * which we want to log for audit purpose.
+ * Example entity. Represents an "event" which happened in the application and which we want to log
+ * for audit purpose.
  *
- * <p>
- * Note that as a matter of convention we use plural for table names
- * ("APP_EVENTS") but singular for entities ("AppEvent"). However, it doesn't
- * matter which convention you use as long as you are consistent.
+ * <p>Note that as a matter of convention we use plural for table names ("APP_EVENTS") but singular
+ * for entities ("AppEvent"). However, it doesn't matter which convention you use as long as you are
+ * consistent.
  */
 @Entity
 @Table(name = "APP_EVENTS")
 public class AppEvent implements Serializable {
 
-    private static final long serialVersionUID = 3854338978648790802L;
+  private static final long serialVersionUID = 3854338978648790802L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "APP_EVENT_ID")
-    private long appEventId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "APP_EVENT_ID")
+  private long appEventId;
 
-    @Convert(converter = InstantToLongConverter.class)
-    @Column(name = "EVENT_TIME_UTC")
-    private Instant eventTime;
+  @Convert(converter = InstantToLongConverter.class)
+  @Column(name = "EVENT_TIME_UTC")
+  private Instant eventTime;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "EVENT_TYPE")
-    private EventType eventType;
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "EVENT_TYPE")
+  private EventType eventType;
 
-    @Column(name = "EVENT_TEXT")
-    private String eventText;
+  @Column(name = "EVENT_TEXT")
+  private String eventText;
 
-    public long getAppEventId() {
-        return appEventId;
-    }
+  public long getAppEventId() {
+    return appEventId;
+  }
 
-    public void setAppEventId(long appEventId) {
-        this.appEventId = appEventId;
-    }
+  public void setAppEventId(long appEventId) {
+    this.appEventId = appEventId;
+  }
 
-    public Instant getEventTime() {
-        return eventTime;
-    }
+  public Instant getEventTime() {
+    return eventTime;
+  }
 
-    public void setEventTime(Instant eventTime) {
-        this.eventTime = eventTime;
-    }
+  public void setEventTime(Instant eventTime) {
+    this.eventTime = eventTime;
+  }
 
-    public EventType getEventType() {
-        return eventType;
-    }
+  public EventType getEventType() {
+    return eventType;
+  }
 
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
+  public void setEventType(EventType eventType) {
+    this.eventType = eventType;
+  }
 
-    public String getEventText() {
-        return eventText;
-    }
+  public String getEventText() {
+    return eventText;
+  }
 
-    public void setEventText(String eventText) {
-        this.eventText = eventText;
-    }
+  public void setEventText(String eventText) {
+    this.eventText = eventText;
+  }
 
-    @Override
-    public String toString() {
-        return "AppEvent{" + "appEventId=" + appEventId + ", eventTime=" + eventTime + ", eventType=" + eventType + ", eventText=" + eventText + '}';
-    }
+  @Override
+  public String toString() {
+    return "AppEvent{"
+        + "appEventId="
+        + appEventId
+        + ", eventTime="
+        + eventTime
+        + ", eventType="
+        + eventType
+        + ", eventText="
+        + eventText
+        + '}';
+  }
 
-    public enum EventType {
-        LOGIN,
-        SEARCH
-    }
+  public enum EventType {
+    LOGIN,
+    SEARCH
+  }
 }

@@ -15,6 +15,8 @@
  */
 package net.lbruun.springboot.preliquibase.example;
 
+import java.text.MessageFormat;
+import java.util.Locale;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -23,55 +25,61 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 
-import java.text.MessageFormat;
-import java.util.Locale;
-
 /**
  * Validates Spring Environment properties <i>before</i> Spring Boot auto-configuration kicks in.
  *
- * <p>
- * The purpose here is to make sure the "medusa.envName" property is not of mixed case
- * as it would wreak havoc in the way Liquibase works.
+ * <p>The purpose here is to make sure the "medusa.envName" property is not of mixed case as it
+ * would wreak havoc in the way Liquibase works.
  *
- * <p>
- * The processor must be registered in {@code META-INF/spring.factories}.
+ * <p>The processor must be registered in {@code META-INF/spring.factories}.
  *
  * @author lbruun
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class EnvironmentValidator implements EnvironmentPostProcessor {
 
-    @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        validateMedusaEnvName(environment);
-    }
+  @Override
+  public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+    validateMedusaEnvName(environment);
+  }
 
-    private void validateMedusaEnvName(ConfigurableEnvironment environment) {
-        String envNamePropName = "medusa.envName";
-        String envNameVal = environment.getProperty(envNamePropName);
-        if (envNameVal != null && isMixedCase(envNameVal)) {
-            String msgFormat = "{0} has a value, ''{1}'', which is if mixed-case. This is not allowed. Aborting.";
-            if (isOsEnvVarDefined(environment, envNamePropName)) {
-                throw new IllegalStateException(MessageFormat.format(msgFormat, "OS environment variable MEDUSA_ENVNAME", envNameVal));
-            }
-            if (isSysPropDefined(environment, envNamePropName)) {
-                throw new IllegalStateException(MessageFormat.format(msgFormat, "System property " + envNamePropName, envNameVal));
-            }
-            throw new IllegalStateException(MessageFormat.format(msgFormat, "Property " + envNamePropName, envNameVal));
-        }
+  private void validateMedusaEnvName(ConfigurableEnvironment environment) {
+    String envNamePropName = "medusa.envName";
+    String envNameVal = environment.getProperty(envNamePropName);
+    if (envNameVal != null && isMixedCase(envNameVal)) {
+      String msgFormat =
+          "{0} has a value, ''{1}'', which is if mixed-case. This is not allowed. Aborting.";
+      if (isOsEnvVarDefined(environment, envNamePropName)) {
+        throw new IllegalStateException(
+            MessageFormat.format(msgFormat, "OS environment variable MEDUSA_ENVNAME", envNameVal));
+      }
+      if (isSysPropDefined(environment, envNamePropName)) {
+        throw new IllegalStateException(
+            MessageFormat.format(msgFormat, "System property " + envNamePropName, envNameVal));
+      }
+      throw new IllegalStateException(
+          MessageFormat.format(msgFormat, "Property " + envNamePropName, envNameVal));
     }
+  }
 
-    private boolean isMixedCase(String value) {
-        return !(value.toLowerCase(Locale.US).equals(value) || value.toUpperCase(Locale.US).equals(value));
-    }
+  private boolean isMixedCase(String value) {
+    return !(value.toLowerCase(Locale.US).equals(value)
+        || value.toUpperCase(Locale.US).equals(value));
+  }
 
-    private boolean isOsEnvVarDefined(ConfigurableEnvironment environment, String propertyName) {
-        PropertySource<?> propertySource = environment.getPropertySources().get(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
-        return (propertySource != null && propertySource.containsProperty(propertyName));
-    }
+  private boolean isOsEnvVarDefined(ConfigurableEnvironment environment, String propertyName) {
+    PropertySource<?> propertySource =
+        environment
+            .getPropertySources()
+            .get(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
+    return (propertySource != null && propertySource.containsProperty(propertyName));
+  }
 
-    private boolean isSysPropDefined(ConfigurableEnvironment environment, String propertyName) {
-        PropertySource<?> propertySource = environment.getPropertySources().get(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
-        return (propertySource != null && propertySource.containsProperty(propertyName));
-    }
+  private boolean isSysPropDefined(ConfigurableEnvironment environment, String propertyName) {
+    PropertySource<?> propertySource =
+        environment
+            .getPropertySources()
+            .get(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
+    return (propertySource != null && propertySource.containsProperty(propertyName));
+  }
 }

@@ -18,9 +18,6 @@ package net.lbruun.springboot.preliquibase.example.jpa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * JPA Repository for 'Person' entity.
- */
+/** JPA Repository for 'Person' entity. */
 @Repository
-public interface PersonRepo extends JpaRepository<Person, Long> {
-}
+public interface PersonRepo extends JpaRepository<Person, Long> {}

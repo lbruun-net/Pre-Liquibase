@@ -17,37 +17,35 @@ package net.lbruun.springboot.preliquibase.example;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- *
- */
+/** */
 @ConfigurationProperties(prefix = "medusa", ignoreUnknownFields = false)
 public class MedusaProperties {
 
-    private String db1SchemaName;
-    private String db2SchemaName;
-    private String envName;
+  private String db1SchemaName;
+  private String db2SchemaName;
+  private String envName;
 
-    public String getDb1SchemaName() {
-        return db1SchemaName;
-    }
+  public String getDb1SchemaName() {
+    return db1SchemaName;
+  }
 
-    public void setDb1SchemaName(String db1SchemaName) {
-        this.db1SchemaName = db1SchemaName;
-    }
+  public void setDb1SchemaName(String db1SchemaName) {
+    this.db1SchemaName = db1SchemaName;
+  }
 
-    public String getDb2SchemaName() {
-        return db2SchemaName;
-    }
+  public String getDb2SchemaName() {
+    return db2SchemaName;
+  }
 
-    public void setDb2SchemaName(String db2SchemaName) {
-        this.db2SchemaName = db2SchemaName;
-    }
+  public void setDb2SchemaName(String db2SchemaName) {
+    this.db2SchemaName = db2SchemaName;
+  }
 
-    public String getEnvName() {
-        return envName;
-    }
+  public String getEnvName() {
+    return envName;
+  }
 
-    public void setEnvName(String envName) {
-        this.envName = envName;
-    }
+  public void setEnvName(String envName) {
+    this.envName = envName;
+  }
 }

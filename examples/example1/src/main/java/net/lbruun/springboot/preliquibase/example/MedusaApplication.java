@@ -18,13 +18,11 @@ package net.lbruun.springboot.preliquibase.example;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Example application
- */
+/** Example application */
 @SpringBootApplication
 public class MedusaApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MedusaApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(MedusaApplication.class, args);
+  }
 }

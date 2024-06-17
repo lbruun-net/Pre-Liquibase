@@ -15,15 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-    <root level="debug">
-        <appender-ref ref="CONSOLE"/>
-    </root>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+  <root level="debug">
+    <appender-ref ref="CONSOLE"/>
+  </root>
 
-    <!--    These Liquibase classes produce an enourmous amount of log output
-            at the DEBUG level. Therefore, they are silenced here.   -->
-    <logger name="liquibase.servicelocator.DefaultPackageScanClassResolver" level="info"/>
-    <logger name="liquibase.servicelocator.ServiceLocator" level="info"/>
-    <logger name="liquibase.resource.ClassLoaderResourceAccessor" level="info"/>
+  <!--    These Liquibase classes produce an enourmous amount of log output
+          at the DEBUG level. Therefore, they are silenced here.   -->
+  <logger name="liquibase.servicelocator.DefaultPackageScanClassResolver" level="info"/>
+  <logger name="liquibase.servicelocator.ServiceLocator" level="info"/>
+  <logger name="liquibase.resource.ClassLoaderResourceAccessor" level="info"/>
 </configuration>

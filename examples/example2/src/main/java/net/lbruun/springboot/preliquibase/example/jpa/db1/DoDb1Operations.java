@@ -15,36 +15,33 @@
  */
 package net.lbruun.springboot.preliquibase.example.jpa.db1;
 
+import java.time.LocalDate;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
-/**
- * Do something on the database to show that DB operations work.
- */
+/** Do something on the database to show that DB operations work. */
 @Component
 public class DoDb1Operations implements ApplicationRunner {
 
-    private final PersonRepo personRepo;
+  private final PersonRepo personRepo;
 
-    public DoDb1Operations(PersonRepo personRepo) {
-        this.personRepo = personRepo;
+  public DoDb1Operations(PersonRepo personRepo) {
+    this.personRepo = personRepo;
+  }
+
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    if (personRepo.count() == 0) {
+      Person person = new Person();
+      person.setFirstName("Donald");
+      person.setLastName("Duck");
+      person.setBirthDate(LocalDate.of(1934, 6, 9));
+      personRepo.save(person);
     }
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        if (personRepo.count() == 0) {
-            Person person = new Person();
-            person.setFirstName("Donald");
-            person.setLastName("Duck");
-            person.setBirthDate(LocalDate.of(1934, 6, 9));
-            personRepo.save(person);
-        }
-
-        for (Person person : personRepo.findAll()) {
-            System.out.println("Found person: " + person);
-        }
+    for (Person person : personRepo.findAll()) {
+      System.out.println("Found person: " + person);
     }
+  }
 }

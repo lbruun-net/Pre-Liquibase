@@ -18,31 +18,31 @@ package net.lbruun.springboot.preliquibase.example.jpa;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 
 /**
- * Enhanced version of {@link JpaProperties} which also allows to define
- * <i>Persistence Unit name</i> as a property.
+ * Enhanced version of {@link JpaProperties} which also allows to define <i>Persistence Unit
+ * name</i> as a property.
  */
 public class JpaPropertiesEnchanced extends JpaProperties {
 
-    private String persistenceUnitName;
+  private String persistenceUnitName;
 
-    /**
-     * Get Persistence Unit name,
-     *
-     * @return name
-     * @see #setPersistenceUnitName(java.lang.String)
-     */
-    public String getPersistenceUnitName() {
-        return persistenceUnitName;
-    }
+  /**
+   * Get Persistence Unit name,
+   *
+   * @return name
+   * @see #setPersistenceUnitName(java.lang.String)
+   */
+  public String getPersistenceUnitName() {
+    return persistenceUnitName;
+  }
 
-    /**
-     * Set name to use for the Persistence Unit. In an application with more
-     * than one Persistence Unit it is beneficial to be able to tell them apart
-     * by their name. The name is often used in log output.
-     *
-     * @param persistenceUnitName name
-     */
-    public void setPersistenceUnitName(String persistenceUnitName) {
-        this.persistenceUnitName = persistenceUnitName;
-    }
+  /**
+   * Set name to use for the Persistence Unit. In an application with more than one Persistence Unit
+   * it is beneficial to be able to tell them apart by their name. The name is often used in log
+   * output.
+   *
+   * @param persistenceUnitName name
+   */
+  public void setPersistenceUnitName(String persistenceUnitName) {
+    this.persistenceUnitName = persistenceUnitName;
+  }
 }
