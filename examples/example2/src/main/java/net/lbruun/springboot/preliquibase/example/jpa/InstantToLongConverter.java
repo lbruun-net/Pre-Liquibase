@@ -17,32 +17,30 @@ package net.lbruun.springboot.preliquibase.example.jpa;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-
 import java.time.Instant;
 
 /**
- * JPA Converter between Java Instant and {@code long}. This allows timestamps
- * to be stored in a database as a BIGINT while representing it in the
- * application as an {@code Instant}. Storing the value as a BIGINT avoids
- * problems with databases which does not support a true always-UTC TIMESTAMP
- * type.
+ * JPA Converter between Java Instant and {@code long}. This allows timestamps to be stored in a
+ * database as a BIGINT while representing it in the application as an {@code Instant}. Storing the
+ * value as a BIGINT avoids problems with databases which does not support a true always-UTC
+ * TIMESTAMP type.
  */
 @Converter(autoApply = false)
 public class InstantToLongConverter implements AttributeConverter<Instant, Long> {
 
-    @Override
-    public Long convertToDatabaseColumn(Instant attribute) {
-        if (attribute == null) {
-            return null;
-        }
-        return attribute.toEpochMilli();
+  @Override
+  public Long convertToDatabaseColumn(Instant attribute) {
+    if (attribute == null) {
+      return null;
     }
+    return attribute.toEpochMilli();
+  }
 
-    @Override
-    public Instant convertToEntityAttribute(Long dbData) {
-        if (dbData == null) {
-            return null;
-        }
-        return Instant.ofEpochMilli(dbData);
+  @Override
+  public Instant convertToEntityAttribute(Long dbData) {
+    if (dbData == null) {
+      return null;
     }
+    return Instant.ofEpochMilli(dbData);
+  }
 }

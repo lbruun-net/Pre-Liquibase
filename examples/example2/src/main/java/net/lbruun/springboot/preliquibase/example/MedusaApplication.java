@@ -23,21 +23,19 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 
-/**
- * Example application
- */
+/** Example application */
 @SpringBootApplication
 public class MedusaApplication {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MedusaApplication.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MedusaApplication.class);
 
-    public static void main(String[] args) {
-        SpringApplication.run(MedusaApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(MedusaApplication.class, args);
+  }
 
-    @EventListener
-    public void handleContextRefresh(ContextRefreshedEvent event) {
-        final Environment env = event.getApplicationContext().getEnvironment();
-        LOGGER.info("Medusa environment name: " + env.getProperty("medusa.envName"));
-    }
+  @EventListener
+  public void handleContextRefresh(ContextRefreshedEvent event) {
+    final Environment env = event.getApplicationContext().getEnvironment();
+    LOGGER.info("Medusa environment name: " + env.getProperty("medusa.envName"));
+  }
 }

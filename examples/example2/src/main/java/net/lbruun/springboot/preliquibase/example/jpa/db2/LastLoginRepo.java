@@ -18,9 +18,6 @@ package net.lbruun.springboot.preliquibase.example.jpa.db2;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * JPA Repository for 'LastLogin' entity.
- */
+/** JPA Repository for 'LastLogin' entity. */
 @Repository
-public interface LastLoginRepo extends JpaRepository<LastLogin, String> {
-}
+public interface LastLoginRepo extends JpaRepository<LastLogin, String> {}

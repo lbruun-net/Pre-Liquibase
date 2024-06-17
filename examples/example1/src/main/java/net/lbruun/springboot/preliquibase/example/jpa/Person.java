@@ -19,71 +19,78 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
  * Example entity.
  *
- * <p>
- * Note that as a matter of convention we use plural for table names ("PERSONS")
- * but singular for entities ("Person"). However, it doesn't matter which
- * convention you use as long as you are consistent.
+ * <p>Note that as a matter of convention we use plural for table names ("PERSONS") but singular for
+ * entities ("Person"). However, it doesn't matter which convention you use as long as you are
+ * consistent.
  */
 @Entity
 @Table(name = "PERSONS")
 public class Person implements Serializable {
 
-    private static final long serialVersionUID = 5959972351639377810L;
+  private static final long serialVersionUID = 5959972351639377810L;
 
-    @Id
-    @Column(name = "PERSON_ID")
-    private long personId;
+  @Id
+  @Column(name = "PERSON_ID")
+  private long personId;
 
-    @Column(name = "FIRST_NAME")
-    private String firstName;
+  @Column(name = "FIRST_NAME")
+  private String firstName;
 
-    @Column(name = "LAST_NAME")
-    private String lastName;
+  @Column(name = "LAST_NAME")
+  private String lastName;
 
-    @Column(name = "BIRTH_DATE")
-    private LocalDate birthDate;
+  @Column(name = "BIRTH_DATE")
+  private LocalDate birthDate;
 
-    public long getPersonId() {
-        return personId;
-    }
+  public long getPersonId() {
+    return personId;
+  }
 
-    public void setPersonId(long personId) {
-        this.personId = personId;
-    }
+  public void setPersonId(long personId) {
+    this.personId = personId;
+  }
 
-    public String getFirstName() {
-        return firstName;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public String getLastName() {
-        return lastName;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
+  public LocalDate getBirthDate() {
+    return birthDate;
+  }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
+  public void setBirthDate(LocalDate birthDate) {
+    this.birthDate = birthDate;
+  }
 
-    @Override
-    public String toString() {
-        return "Person{" + "personId=" + personId + ", firstName=" + firstName + ", lastName=" + lastName + ", birthDate=" + birthDate + '}';
-    }
+  @Override
+  public String toString() {
+    return "Person{"
+        + "personId="
+        + personId
+        + ", firstName="
+        + firstName
+        + ", lastName="
+        + lastName
+        + ", birthDate="
+        + birthDate
+        + '}';
+  }
 }

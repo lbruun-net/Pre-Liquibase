@@ -14,8 +14,5 @@
  * limitations under the License.
  */
 
-
-/**
- * Pre-Liquibase.
- */
+/** Pre-Liquibase. */
 package net.lbruun.springboot.preliquibase;
