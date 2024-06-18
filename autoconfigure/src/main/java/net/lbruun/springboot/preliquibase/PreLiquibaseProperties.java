@@ -37,11 +37,12 @@ public class PreLiquibaseProperties {
   public static final String PROPERTIES_PREFIX = "preliquibase";
   public static final String DEFAULT_SCRIPT_LOCATION = "classpath:preliquibase/";
 
+  /** If the Pre-Liquibase module is enabled or not. */
   private boolean enabled = true;
 
   /**
-   * Database platform code to use when choosing which SQL script files to execute (such as {@code
-   * preliquibase/${dbPlatformCode}.sql}).
+   * Database platform code to use when choosing which SQL script files to execute. By default, this
+   * value is auto-detected.
    */
   private String dbPlatformCode;
 
@@ -49,7 +50,7 @@ public class PreLiquibaseProperties {
   @NotEmpty(message = "sqlScriptReferences must not be empty")
   private List<String> sqlScriptReferences = Collections.singletonList(DEFAULT_SCRIPT_LOCATION);
 
-  /** Whether to stop if an error occurs while executing the SQL script. */
+  /** Whether to stop if an error occurs while executing the SQL script(s). */
   private boolean continueOnError = false;
 
   /** Statement separator in SQL initialization scripts. */
