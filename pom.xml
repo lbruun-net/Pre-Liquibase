@@ -43,7 +43,7 @@ limitations under the License.
     <sha1/>
   </properties>
 
-  <url>https://github.com/lbruun/Pre-Liquibase</url>
+  <url>https://github.com/lbruun-net/Pre-Liquibase</url>
 
   <description>
     Parent for Pre-Liquibase Spring Boot module
@@ -70,7 +70,7 @@ limitations under the License.
     <developer>
       <name>Lars Bruun-Hansen</name>
       <organization>lbruun.net</organization>
-      <organizationUrl>https://github.com/lbruun</organizationUrl>
+      <organizationUrl>https://github.com/lbruun-net</organizationUrl>
     </developer>
   </developers>
 
