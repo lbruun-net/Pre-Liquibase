@@ -14,7 +14,7 @@ endif::[]
 
 
 image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="http://www.apache.org/licenses/LICENSE-2.0",target=_blank]
-image:https://github.com/lbruun/pre-liquibase/actions/workflows/main.yml/badge.svg[CI,link="https://github.com/lbruun/Pre-Liquibase/actions/workflows/main.yml"]
+image:https://github.com/lbruun-net/pre-liquibase/actions/workflows/main.yml/badge.svg[CI,link="https://github.com/lbruun-net/Pre-Liquibase/actions/workflows/main.yml"]
 image:https://maven-badges.herokuapp.com/maven-central/net.lbruun.springboot/preliquibase-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/net.lbruun.springboot/preliquibase-spring-boot-starter"]
 image:https://javadoc.io/badge2/net.lbruun.springboot/preliquibase-spring-boot-autoconfigure/javadoc.svg[javadoc,link="https://javadoc.io/doc/net.lbruun.springboot/preliquibase-spring-boot-autoconfigure"]
 
@@ -419,7 +419,7 @@ logging.level.liquibase=TRACE
 
 Pre-Liquibase assumes that you are using auto-configuration for Liquibase as well. If you are manually
 configuring a bean of type `SpringLiquibase` then Pre-Liquibase will not fire. You can find the background
-for this explained in https://github.com/lbruun/Pre-Liquibase/issues/5[Issue #5]. In such case you'll have
+for this explained in https://github.com/lbruun-net/Pre-Liquibase/issues/5[Issue #5]. In such case you'll have
 to configure all beans yourself. You can find an example of this in link:example2/[Example 2] which you can
 easily adapt to a single datasource use-case.
 
