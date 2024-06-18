@@ -34,7 +34,6 @@ limitations under the License.
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <project.scm.id>github.com-lbruun.net</project.scm.id>
     <spring.boot.version>3.2.0</spring.boot.version>
 
     <!-- Some sensible defaults for local development.-->
