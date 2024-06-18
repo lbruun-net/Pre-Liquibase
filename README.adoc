@@ -440,13 +440,13 @@ should not work with any future 3.x release of Spring Boot.
 |1.5.x
 |Spring Boot 3.2
 |JDK 17
-|`master`
+|`main`
 |Use this unless you absolutely *must* use an older version of Spring Boot.
 
 |1.4.x
 |Spring Boot 3.1
 |JDK 17
-|`master`
+|`main`
 |Still maintained
 
 |1.3.x
