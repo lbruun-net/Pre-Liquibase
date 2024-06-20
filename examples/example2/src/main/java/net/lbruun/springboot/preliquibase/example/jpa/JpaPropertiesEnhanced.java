@@ -21,12 +21,12 @@ import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
  * Enhanced version of {@link JpaProperties} which also allows to define <i>Persistence Unit
  * name</i> as a property.
  */
-public class JpaPropertiesEnchanced extends JpaProperties {
+public class JpaPropertiesEnhanced extends JpaProperties {
 
   private String persistenceUnitName;
 
   /**
-   * Get Persistence Unit name,
+   * Get Persistence Unit name.
    *
    * @return name
    * @see #setPersistenceUnitName(java.lang.String)
