@@ -19,7 +19,7 @@ image:https://maven-badges.herokuapp.com/maven-central/net.lbruun.springboot/pre
 image:https://javadoc.io/badge2/net.lbruun.springboot/preliquibase-spring-boot-autoconfigure/javadoc.svg[javadoc,link="https://javadoc.io/doc/net.lbruun.springboot/preliquibase-spring-boot-autoconfigure"]
 
 
-Companion to https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-execute-liquibase-database-migrations-on-startup[Spring Boot Liquibase module]
+Companion to https://docs.spring.io/spring-boot/how-to/data-initialization.html#howto.data-initialization.migration-tool.liquibase[Spring Boot Liquibase module]
 which allows to execute some SQL script file _prior_ to executing https://www.liquibase.org/[Liquibase] ChangeSets.
 
 Why? While you should be using Liquibase for all your DDL there's a bit of a chicken-and-egg problem: 
