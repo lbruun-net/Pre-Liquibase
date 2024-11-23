@@ -39,7 +39,7 @@ If not, you should pause and ask yourself if you are doing the right thing.
 The module requires 
 
 - Java 17 or later (artifacts before `1.3` only require Java 8 but do not support Spring Boot 3)
-- Spring Boot 3.1 or later (for older versions see <<Spring Boot compatibility>>)
+- Spring Boot 3.2 or later (for older versions see <<Spring Boot compatibility>>)
 
 {nbsp} +
 {nbsp} +
