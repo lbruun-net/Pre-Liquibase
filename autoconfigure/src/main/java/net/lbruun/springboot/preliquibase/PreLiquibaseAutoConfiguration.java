@@ -31,17 +31,18 @@ import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.jdbc.JdbcConnectionDetails;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseConnectionDetails;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.autoconfigure.liquibase.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Auto-configuration for Pre-Liquibase.
@@ -72,19 +73,13 @@ public class PreLiquibaseAutoConfiguration {
   @ConditionalOnMissingBean({PreLiquibaseDataSourceProvider.class})
   @Bean
   public PreLiquibaseDataSourceProvider preLiquibaseDataSourceProvider(
-      LiquibaseProperties liquibaseProperties,
-      DataSourceProperties dataSourceProperties,
       ObjectProvider<DataSource> dataSource,
       @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
       LiquibaseConnectionDetails connectionDetails) {
     logger.debug("Instantiation of PreLiquibaseDataSourceProvider");
 
     return new DefaultPreLiquibaseDataSourceProvider(
-        liquibaseProperties,
-        dataSourceProperties,
-        dataSource,
-        liquibaseDataSource,
-        connectionDetails);
+        dataSource, liquibaseDataSource, connectionDetails);
   }
 
   /**
@@ -185,8 +180,6 @@ public class PreLiquibaseAutoConfiguration {
     /**
      * Determine DataSource (based on input) which Liquibase itself is using.
      *
-     * @param liquibaseProperties Spring Boot properties for Liquibase ("spring.liquibase")
-     * @param dataSourceProperties Spring Boot properties for DataSource ("spring.datasource")
      * @param dataSource general DataSource (if any)
      * @param liquibaseDataSource designated DataSource for Liquibase (if any). This is typically a
      *     DataSource which has been annotated with {@code @LiquibaseDataSource} in order to mark it
@@ -195,37 +188,63 @@ public class PreLiquibaseAutoConfiguration {
      * @param connectionDetails
      */
     public DefaultPreLiquibaseDataSourceProvider(
-        @NonNull LiquibaseProperties liquibaseProperties,
-        @NonNull DataSourceProperties dataSourceProperties,
         @NonNull ObjectProvider<DataSource> dataSource,
         @NonNull ObjectProvider<DataSource> liquibaseDataSource,
         @NonNull LiquibaseConnectionDetails connectionDetails) {
 
-      // Here we re-use Spring Boot's own LiquibaseAutoConfiguration
-      // so that we figure out which DataSource will (later) be used
-      // by LiquibaseAutoConfiguration. This ensures that we use the same
-      // logic for figuring out which DataSource to use.
-      // Note that SpringLiquibase object below gets instantiated OUTSIDE
-      // of the IoC container, meaning it is just normal "new" instantiation.
-      // This is important as we do not want the SpringLiquibase's
-      // afterPropertiesSet method to kick in. All we are interested in
-      // is to figure out which datasource Liquibase would be using.
-      LiquibaseAutoConfiguration.LiquibaseConfiguration liquibaseConfiguration =
-          new LiquibaseAutoConfiguration.LiquibaseConfiguration();
-      SpringLiquibase liquibase =
-          liquibaseConfiguration.liquibase(
-              dataSource, liquibaseDataSource, liquibaseProperties, connectionDetails);
+      // Here we try to mimic Spring Boot's own LiquibaseAutoConfiguration so that we figure out
+      // which DataSource will (later) be used by LiquibaseAutoConfiguration.
+      dataSourceToUse =
+          getMigrationDataSource(
+              liquibaseDataSource.getIfAvailable(), dataSource.getIfAvailable(), connectionDetails);
 
       // Sanity check
       Objects.requireNonNull(
-          liquibase.getDataSource(),
+          dataSourceToUse,
           "Unexpected: null value for DataSource returned from SpringLiquibase class");
-      this.dataSourceToUse = liquibase.getDataSource();
     }
 
     @Override
     public DataSource getDataSource() {
       return dataSourceToUse;
+    }
+
+    // Copied from Spring Boot project
+    private DataSource getMigrationDataSource(
+        DataSource liquibaseDataSource,
+        DataSource dataSource,
+        LiquibaseConnectionDetails connectionDetails) {
+      if (liquibaseDataSource != null) {
+        return liquibaseDataSource;
+      }
+      String url = connectionDetails.getJdbcUrl();
+      if (url != null) {
+        DataSourceBuilder<?> builder =
+            DataSourceBuilder.create().type(SimpleDriverDataSource.class);
+        builder.url(url);
+        applyConnectionDetails(connectionDetails, builder);
+        return builder.build();
+      }
+      String user = connectionDetails.getUsername();
+      if (user != null && dataSource != null) {
+        DataSourceBuilder<?> builder =
+            DataSourceBuilder.derivedFrom(dataSource).type(SimpleDriverDataSource.class);
+        applyConnectionDetails(connectionDetails, builder);
+        return builder.build();
+      }
+      Assert.state(dataSource != null, "Liquibase migration DataSource missing");
+      return dataSource;
+    }
+
+    // Copied from Spring Boot project
+    private void applyConnectionDetails(
+        LiquibaseConnectionDetails connectionDetails, DataSourceBuilder<?> builder) {
+      builder.username(connectionDetails.getUsername());
+      builder.password(connectionDetails.getPassword());
+      String driverClassName = connectionDetails.getDriverClassName();
+      if (StringUtils.hasText(driverClassName)) {
+        builder.driverClassName(driverClassName);
+      }
     }
   }
 }

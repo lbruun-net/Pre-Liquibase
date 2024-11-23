@@ -38,6 +38,10 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.util.Objects;
 
 @Configuration
 @EnableConfigurationProperties({MedusaProperties.class})
@@ -61,7 +65,9 @@ public class MedusaApplicationConfig {
       liquibase.setDataSource(dataSource);
       liquibase.setChangeLog(liquibaseProperties.getChangeLog());
       liquibase.setClearCheckSums(liquibaseProperties.isClearChecksums());
-      liquibase.setContexts(liquibaseProperties.getContexts());
+      if (!CollectionUtils.isEmpty(liquibaseProperties.getContexts())) {
+        liquibase.setContexts(StringUtils.collectionToCommaDelimitedString(liquibaseProperties.getContexts()));
+      }
       liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
       liquibase.setLiquibaseSchema(liquibaseProperties.getLiquibaseSchema());
       liquibase.setLiquibaseTablespace(liquibaseProperties.getLiquibaseTablespace());
@@ -69,7 +75,9 @@ public class MedusaApplicationConfig {
       liquibase.setDatabaseChangeLogLockTable(liquibaseProperties.getDatabaseChangeLogLockTable());
       liquibase.setDropFirst(liquibaseProperties.isDropFirst());
       liquibase.setShouldRun(liquibaseProperties.isEnabled());
-      liquibase.setLabelFilter(liquibaseProperties.getLabelFilter());
+      if (!CollectionUtils.isEmpty(liquibaseProperties.getLabelFilter())) {
+        liquibase.setLabelFilter(StringUtils.collectionToCommaDelimitedString(liquibaseProperties.getLabelFilter()));
+      }
       liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
       liquibase.setRollbackFile(liquibaseProperties.getRollbackFile());
       liquibase.setTestRollbackOnUpdate(liquibaseProperties.isTestRollbackOnUpdate());
@@ -168,7 +176,7 @@ public class MedusaApplicationConfig {
       public PlatformTransactionManager db1TransactionManager(
           final @Qualifier("db1EntityManagerFactory")
           LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory.getObject());
+        return new JpaTransactionManager(Objects.requireNonNull(entityManagerFactory.getObject()));
       }
     }
 
@@ -248,7 +256,7 @@ public class MedusaApplicationConfig {
       public PlatformTransactionManager db2TransactionManager(
           final @Qualifier("db2EntityManagerFactory")
           LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory.getObject());
+        return new JpaTransactionManager(Objects.requireNonNull(entityManagerFactory.getObject()));
       }
     }
   }
