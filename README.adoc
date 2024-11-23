@@ -425,9 +425,6 @@ easily adapt to a single datasource use-case.
 
 == Spring Boot compatibility
 
-Current version works with Spring Boot 3.1+ and has been tested with version 3.1 and 3.2. There's no reason why it
-should not work with any future 3.x release of Spring Boot.
-
 
 [cols=5*,options=header]
 |===
