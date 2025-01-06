@@ -354,7 +354,7 @@ with each other even if they use the same database.
 
 === Which DataSource is used?
 
-The module will use the same DataSource as Spring Boot Liquibase module does. This seams
+The module will use the same DataSource as Spring Boot Liquibase module does. This seems
 reasonable for an application with a single data source defined. However, it is possible to override this
 by registering your own bean of type `PreLiquibaseDataSourceProvider` while still using auto-configuration
 for everything else.
@@ -488,7 +488,7 @@ You can in theory use Spring Boot's DataSource initialization feature or JPA DDL
 https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.using-basic-sql-scripts[here], 
 but the Spring Boot guide clearly explains that you should not use such methods along side "a higher-level Database Migration Tool, 
 like Flyway or Liquibase" because these methods are not guaranteed to execute before Liquibase and if they happen to do so 
-at the moment, they might not in the future. In constrast the Pre-Liquibase module is designed specifically
+at the moment, they might not in the future. In contrast the Pre-Liquibase module is designed specifically
 for use with Liquibase and is guaranteed to _always_ execute before Liquibase itself.
 
 
