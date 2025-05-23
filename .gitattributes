@@ -27,3 +27,6 @@ spring.factories   text eol=lf
 .gitignore         text eol=lf
 LICENSE            text eol=lf
 
+/mvnw              text eol=lf
+/mvnw.cmd          text eol=crlf
+
