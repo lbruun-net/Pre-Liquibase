@@ -354,7 +354,7 @@ with each other even if they use the same database.
 
 === Which DataSource is used?
 
-The module will use the same DataSource as Spring Boot Liquibase module does. This seams
+The module will use the same DataSource as Spring Boot Liquibase module does. This seems
 reasonable for an application with a single data source defined. However, it is possible to override this
 by registering your own bean of type `PreLiquibaseDataSourceProvider` while still using auto-configuration
 for everything else.
@@ -364,7 +364,7 @@ The other option is to configure the `PreLiquibase` bean(s) yourself in which ca
 application uses multiple data sources. Configuring the beans yourself allows unlimited flexibility.
 However, it typically means you'll have to configure _all_ beans related to persistence
 (Pre-Liquibase, Liquibase, JPA, JTA, etc) yourself as auto-configuration will back off.
-An example of this can be found in link:example2/[Example 2].
+An example of this can be found in link:examples/example2/[Example 2].
 
 
 === To quote or not to quote?
@@ -420,7 +420,7 @@ logging.level.liquibase=TRACE
 Pre-Liquibase assumes that you are using auto-configuration for Liquibase as well. If you are manually
 configuring a bean of type `SpringLiquibase` then Pre-Liquibase will not fire. You can find the background
 for this explained in https://github.com/lbruun-net/Pre-Liquibase/issues/5[Issue #5]. In such case you'll have
-to configure all beans yourself. You can find an example of this in link:example2/[Example 2] which you can
+to configure all beans yourself. You can find an example of this in link:examples/example2/[Example 2] which you can
 easily adapt to a single datasource use-case.
 
 == Spring Boot compatibility
@@ -488,7 +488,7 @@ You can in theory use Spring Boot's DataSource initialization feature or JPA DDL
 https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.using-basic-sql-scripts[here], 
 but the Spring Boot guide clearly explains that you should not use such methods along side "a higher-level Database Migration Tool, 
 like Flyway or Liquibase" because these methods are not guaranteed to execute before Liquibase and if they happen to do so 
-at the moment, they might not in the future. In constrast the Pre-Liquibase module is designed specifically
+at the moment, they might not in the future. In contrast the Pre-Liquibase module is designed specifically
 for use with Liquibase and is guaranteed to _always_ execute before Liquibase itself.
 
 
