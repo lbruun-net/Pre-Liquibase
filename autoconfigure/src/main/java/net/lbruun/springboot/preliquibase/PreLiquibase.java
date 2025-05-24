@@ -314,6 +314,7 @@ public class PreLiquibase {
             PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX,
             PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX,
             PlaceholderConfigurerSupport.DEFAULT_VALUE_SEPARATOR,
+            null,
             false // error on unresolvable placeholders
             );
 
