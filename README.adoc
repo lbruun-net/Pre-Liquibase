@@ -435,7 +435,7 @@ easily adapt to a single datasource use-case.
 |Description
 
 |1.6.x
-|Spring Boot 3.4 and 3.5
+|Spring Boot 3.4 + 3.5
 |JDK 17
 |`main`
 |Use this unless you absolutely *must* use an older version of Spring Boot.
