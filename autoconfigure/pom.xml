@@ -20,12 +20,18 @@ limitations under the License.
   <parent>
     <groupId>net.lbruun.springboot</groupId>
     <artifactId>preliquibase-spring-boot-parent</artifactId>
-    <version>${revision}${sha1}${changelist}</version>
+    <version>${revision}</version>
   </parent>
   <artifactId>preliquibase-spring-boot-autoconfigure</artifactId>
   <packaging>jar</packaging>
   <name>Spring Boot AutoConfiguration :: Pre-Liquibase AutoConfiguration</name>
   <description>Autoconfiguration for Pre-Liquibase</description>
+
+  <properties>
+    <maven.install.skip>false</maven.install.skip>                  <!-- override parent's setting -->
+    <gpg.skip>false</gpg.skip>                                      <!-- override parent's setting -->
+    <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>  <!-- override parent's setting -->
+  </properties>
 
   <dependencies>
     <dependency>
@@ -62,22 +68,4 @@ limitations under the License.
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>  <!-- Must be at least 2.22 for Junit 5 -->
-      </plugin>
-
-      <!-- Do deploy current project -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>false</skip>
-        </configuration>
-      </plugin>
-
-    </plugins>
-  </build>
 </project>

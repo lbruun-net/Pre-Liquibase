@@ -20,7 +20,7 @@ limitations under the License.
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.lbruun.springboot</groupId>
   <artifactId>preliquibase-spring-boot-parent</artifactId>
-  <version>${revision}${sha1}${changelist}</version> <!-- never change this -->
+  <version>${revision}</version> <!-- never change this -->
   <packaging>pom</packaging>
   <modules>
     <module>autoconfigure</module>
@@ -36,13 +36,21 @@ limitations under the License.
     <maven.compiler.target>17</maven.compiler.target>
     <spring.boot.version>3.4.0</spring.boot.version>
 
-    <!-- Some sensible defaults for local development.-->
-    <revision/>
-    <changelist>LATEST-SNAPSHOT</changelist>
-    <sha1/>
+    <!-- parent doesn't need to be installed, deployed or signed.
+         (these are overridden in submodules)                -->
+    <maven.install.skip>true</maven.install.skip>
+    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+    <gpg.skip>true</gpg.skip>
+
+
+    <!-- Some sensible defaults for local development.
+         These values are only used when executing Maven locally. -->
+    <revision>LATEST-SNAPSHOT</revision>
+    <ci.project.url>https://UNKNOWN.ORG</ci.project.url> <!-- placeholder: set dynamically by the CI system -->
+    <ci.scm.tag>HEAD</ci.scm.tag>                        <!-- placeholder: set dynamically by the CI system -->
   </properties>
 
-  <url>https://github.com/lbruun-net/Pre-Liquibase</url>
+  <url>${ci.project.url}</url>
 
   <description>
     Parent for Pre-Liquibase Spring Boot module
@@ -59,10 +67,9 @@ limitations under the License.
     </license>
   </licenses>
 
-  <scm>
-    <connection>scm:git:https://github.com/lbruun-net/Pre-Liquibase.git</connection>
-    <developerConnection>scm:git:https://github.com/lbruun-net/Pre-Liquibase.git</developerConnection>
-    <url>https://github.com/lbruun-net/Pre-Liquibase</url>
+  <scm child.scm.url.inherit.append.path="false">
+    <url>${ci.project.url}/tree/${project.scm.tag}</url>
+    <tag>${ci.scm.tag}</tag>
   </scm>
 
   <developers>
@@ -88,16 +95,6 @@ limitations under the License.
 
 
   <build>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.1.2</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
     <plugins>
       <plugin>
         <groupId>com.spotify.fmt</groupId>
@@ -113,24 +110,15 @@ limitations under the License.
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.6.2</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
 
+      <!-- The 'flatten-maven-plugin' is required because we use Maven CI Friendly feature
+           and because this is a multi-module project.
+           See https://maven.apache.org/maven-ci-friendly.html for more information.
+           In Maven 4 we can finally get rid of this plugin.                         -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.2.5</version>
+        <version>1.6.0</version>
         <configuration>
           <flattenMode>ossrh</flattenMode>
         </configuration>
@@ -153,29 +141,56 @@ limitations under the License.
           </execution>
         </executions>
       </plugin>
-
-      <!-- Skip deploying 'parent' (current project) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-
     </plugins>
   </build>
 
 
   <profiles>
     <profile>
-      <id>release-to-central</id>
+      <!-- This profile should be activated when building in the CI system -->
+      <id>ci</id>
+      <activation>
+        <property>
+          <!-- GitHub set this variable -->
+          <name>env.CI</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <!--  Javadoc here because we want to know early if there are errors in Javadoc generation.
+                In the standard Sonatype guidelines it is inside the 'release-to-central' profile,
+                which means we will not discover Javadoc errors until we decide to release.
+                Instead, here, we pay the price of Javadoc generation on every push: an acceptable tradeoff.
+          -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.6.2</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <!-- This profile should be activated when creating releases into Maven Central
+         (regardless if regular release or snapshot release). -->
+    <profile>
+      <id>publication</id>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.4</version>
+            <version>3.3.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -188,7 +203,7 @@ limitations under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.2.7</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -197,13 +212,26 @@ limitations under the License.
                   <goal>sign</goal>
                 </goals>
                 <configuration>
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
+                  <signer>bc</signer> <!-- use Bouncy Castle -->
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+
+
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.7.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>maven-central</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+
+              <!-- Flip this if you feel confident about your build, and it passes
+                   the rules of Maven Central                                       -->
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+            </configuration>
           </plugin>
         </plugins>
       </build>

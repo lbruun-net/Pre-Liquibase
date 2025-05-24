@@ -26,7 +26,7 @@ limitations under the License.
   </parent>
   <groupId>net.lbruun.springboot</groupId>
   <artifactId>preliquibase-spring-boot-example-2</artifactId>
-  <version>${revision}${sha1}${changelist}</version>
+  <version>${revision}</version>
   <packaging>jar</packaging>
   <name>Spring Boot AutoConfiguration :: Pre-Liquibase Example 2</name>
 
@@ -35,9 +35,7 @@ limitations under the License.
     <java.version>17</java.version>
 
     <!-- Some sensible defaults for local development.-->
-    <revision/>
-    <changelist>LATEST-SNAPSHOT</changelist>
-    <sha1/>
+    <revision>LATEST-SNAPSHOT</revision>
   </properties>
 
   <!-- For testing Spring Boot release candidates -->
