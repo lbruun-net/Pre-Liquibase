@@ -24,11 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 /**
- * Example Unit test. Not meant to be a show case for best practice of writing Spring Boot JPA unit
+ * Example Unit test. Not meant to be a showcase for best practice of writing Spring Boot JPA unit
  * tests.
  *
  * <p>The main point here is that you can use the @DataJpaTest annotation because it will include
- * Pre-Liquibase auto-configuration
+ * Pre-Liquibase auto-configuration.
  */
 @DataJpaTest
 public class PersonRepoTest {
