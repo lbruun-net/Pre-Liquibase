@@ -53,8 +53,8 @@ public class LiquibaseUtils {
    *   <li>{@code unsupported}. Database not supported by Liquibase
    * </ul>
    *
-   * (These are the same values as those which can be used in a Liquibase {@code dbms} Precondition.
-   * Refer to Liquibase documentation for further information on possible values.)
+   * <p>(These are the same values as those which can be used in a Liquibase {@code dbms}
+   * Precondition. Refer to Liquibase documentation for further information on possible values.)
    *
    * <p>The method invokes {@code
    * liquibase.database.DatabaseFactory#findCorrectDatabaseImplementation()} and therefore requires
@@ -78,8 +78,8 @@ public class LiquibaseUtils {
    */
   public static String getLiquibaseDatabaseShortName(DataSource dataSource) {
     // Credit https://github.com/zorglube for having the Liquibase project add Autocloseable
-    // interface
-    // to their Database and JdbcConnection classes and for proposing simplification in this method.
+    // interface to their 'Database' and 'JdbcConnection' classes and for proposing
+    // simplification in this method.
     try (JdbcConnection jdbcConnection = new JdbcConnection(dataSource.getConnection());
         Database database =
             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection)) {

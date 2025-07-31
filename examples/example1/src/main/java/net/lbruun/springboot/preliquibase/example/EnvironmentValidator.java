@@ -39,7 +39,8 @@ import org.springframework.core.env.StandardEnvironment;
 public class EnvironmentValidator implements EnvironmentPostProcessor {
 
   @Override
-  public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+  public void postProcessEnvironment(
+      ConfigurableEnvironment environment, SpringApplication application) {
     validateMedusaEnvName(environment);
   }
 

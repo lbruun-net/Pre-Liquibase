@@ -71,9 +71,12 @@ public class LastLogin implements Serializable {
   @Override
   public String toString() {
     return "LastLogin{"
-        + "username=" + username
-        + ", ipAddress=" + ipAddress
-        + ", eventTime=" + eventTime
+        + "username="
+        + username
+        + ", ipAddress="
+        + ipAddress
+        + ", eventTime="
+        + eventTime
         + '}';
   }
 }
