@@ -36,6 +36,6 @@ public class MedusaApplication {
   @EventListener
   public void handleContextRefresh(ContextRefreshedEvent event) {
     final Environment env = event.getApplicationContext().getEnvironment();
-    LOGGER.info("Medusa environment name: " + env.getProperty("medusa.envName"));
+    LOGGER.info("Starting. Medusa environment name: " + env.getProperty("medusa.envName"));
   }
 }
