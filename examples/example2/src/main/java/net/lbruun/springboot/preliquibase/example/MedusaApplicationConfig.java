@@ -91,7 +91,8 @@ public class MedusaApplicationConfig {
     private static EntityManagerFactoryBuilder createEntityManagerFactoryBuilder(
         JpaProperties jpaProperties) {
       JpaVendorAdapter jpaVendorAdapter = createJpaVendorAdapter(jpaProperties);
-      return new EntityManagerFactoryBuilder(jpaVendorAdapter, jpaProperties.getProperties(), null);
+      return new EntityManagerFactoryBuilder(
+          jpaVendorAdapter, dataSource -> jpaProperties.getProperties(), null);
     }
 
     private static JpaVendorAdapter createJpaVendorAdapter(JpaProperties jpaProperties) {
